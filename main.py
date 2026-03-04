@@ -38,147 +38,71 @@ def make_terrain():
     height = 0
     for i in range(10):
         for i in range(20):
+            class block:
+                x=0
+                y=0
+                ore='Stone'
+                rect=pygame.Rect(x,y,32,32)
+                hardness=60
+                mined=False
+            terrain.append(block)
+            terrain[-1].x=i*32
+            terrain[-1].y=350+(height*32)
+            terrain[-1].rect=pygame.Rect(i,350,32,32)
             if height < 3:
                 if height == 2 and random.randint(1,2) == 2:
-                    terrain.append(stone)
+                    terrain[-1].ore='Stone'
                 else:
-                    terrain.append(dirt)
+                    terrain[-1].ore='Dirt'
             else:
                 if height > 7 and random.randint(1,2) == 2:
-                    terrain.append("")
+                    terrain[-1].ore=''
                 else:
-                    terrain.append(stone)
+                    terrain[-1].ore='Stone'
         height += 1
     
     return(terrain)
 
 # Drawing of terrain
 terrain = make_terrain()
-def draw_terrain(screen, terrain, player_y):
-    idx = 0
-    x = 0
-    y = 0 - player_y
-    length = len(terrain)/20
-    for i in range(int(length)):
-        for i in range(20):
-            if terrain[idx] != "":
-                screen.blit(terrain[idx], (x,y))
-                if idx == 0:
-                    first_block = font.render(f"First Block: {x}, {math.floor(y)}", True, (255, 255, 255))
-
-            idx += 1
-            x += 32
-        x = 0
-        y += 32
-    return(first_block)
+def draw_terrain(screen, terrain):
+    for i in terrain:
+        if not i.mined and i.y<640 and i.y>-32:
+            if i.ore=='Stone':
+                screen.blit(stone,(i.x,i.y))
+            if i.ore == 'Dirt':
+                screen.blit(dirt,(i.x,i.y))
 
 
-def squares(player_x, player_y):
-    if player_y > -260:
-        global temp1
-        global temp2
-        global temp3
-        global temp4
-        global temp5
-        global temp6
-        global temp7
-        global temp8
-        global temp9
-        global terrain
 
-        idx = 0
-        y = 0
-
-        if player_y < 0:
-            player_y = player_y * -1
-
-        idx = math.floor((player_x-32)/32)
-        print(idx)
-        idx += 16*math.floor((player_y+224)/32)
-        print(idx)
-        if idx < 0:
-            idx = 0
-        if idx > 255:
-            idx = 255
-        if idx > len(terrain):
-            idx = len(terrain)-1
-
-        # Top right
-        if terrain[idx] != "":
-            temp1 = pygame.Rect(math.floor(player_x/32)*32-32, 192, 32, 32)
-            pygame.draw.rect(screen, (0, idx, 255), temp1)
-        idx +1   
-        # Top center
-        if terrain[idx] != "":
-            temp2 = pygame.Rect(math.floor(player_x/32)*32, 192, 32, 32)
-            pygame.draw.rect(screen, (0, 0, 255), temp2)
-        idx +1 
-        # Top left
-        if terrain[idx] != "":
-            temp3 = pygame.Rect(math.floor(player_x/32)*32+32, 192, 32, 32)
-            pygame.draw.rect(screen, (0, 0, 255), temp3)
-        idx +16 
-        # Right
-        if terrain[idx] != "":
-            temp4 = pygame.Rect(math.floor(player_x/32)*32-32, 224, 32, 32)
-            pygame.draw.rect(screen, (0, 0, 255), temp4)
-        idx +1 
-        # Center
-        if terrain[idx] != "":
-            temp5 = pygame.Rect(math.floor(player_x/32)*32, 224, 32, 32)
-            pygame.draw.rect(screen, (0, 0, 255), temp5)
-        idx +1 
-        # Left
-        if terrain[idx] != "":
-            temp6 = pygame.Rect(math.floor(player_x/32)*32+32, 224, 32, 32)
-            pygame.draw.rect(screen, (0, 0, 255), temp6)
-        idx +16 
-        # Bottom right
-        if terrain[idx] != "":
-            temp7 = pygame.Rect(math.floor(player_x/32)*32-32, 256, 32, 32)
-            pygame.draw.rect(screen, (0, 0, 255), temp7)
-        idx +1
-        #Bottom center
-        if terrain[idx] != "":
-            temp8 = pygame.Rect(math.floor(player_x/32)*32, 256, 32, 32)
-            pygame.draw.rect(screen, (255, 0, 255), temp8)
-        idx +1
-        # Bottom left
-        if terrain[idx] != "":
-            temp9 = pygame.Rect(math.floor(player_x/32)*32+32, 256, 32, 32)
-            pygame.draw.rect(screen, (0, 0, 255), temp9)
-    #print(collision)
     
 print(len(terrain)/20)
 hitbox = pygame.Rect(x, 224, 32, 32)
-first_block = font.render(f"Not spawned", True, (255, 255, 255))
-squares(0,0)
 while running:
     screen.fill((0,0,0))
 
-    first_block=draw_terrain(screen, terrain, cam_y)
+    draw_terrain(screen, terrain)
     screen.blit(player, (x, 224))
-
-    y_pos = font.render(f"Y pos: {y}", True, (255, 255, 255))
-    screen.blit(y_pos,(4,4))
     
-    y += speedY * delta_time
     hitbox = pygame.Rect(x, 226, 32, 32)
-    collision = hitbox.colliderect(temp8 or temp9)
+    for i in terrain:
+        pygame.draw.rect(screen, (0, 255, 0), i.rect)
+        collision = hitbox.colliderect(i.rect)
+        if collision:
+            break
+
+    if not collision:
+        for i in terrain:
+            i.y -= 1
+        y -= 1
+
 
     #print(collision)
-    if speedY < 100:
-        speedY = speedY+1
-    if collision:
-        speedY = 0
+    #if speedY < 100:
+        #speedY = speedY+1
+    #if #collision:
+        #speedY = 0
 
-        
-    y_vel = font.render(f"Y vel: {speedY}", True, (255, 255, 255))
-    screen.blit(first_block,(4,20))
-    screen.blit(y_vel,(4,36))
-
-
-    squares(x,y)
     cam_y = y
 
     hitbox = pygame.Rect(x, 224, 32, 32)
