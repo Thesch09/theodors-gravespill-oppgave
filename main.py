@@ -74,7 +74,7 @@ def draw_terrain(screen, terrain, player_y):
 
 
 def squares(player_x, player_y):
-    if player_y > -240:
+    if player_y > -260:
         global temp1
         global temp2
         global temp3
@@ -84,38 +84,69 @@ def squares(player_x, player_y):
         global temp7
         global temp8
         global temp9
+        global terrain
 
         idx = 0
         y = 0
-        
+
+        if player_y < 0:
+            player_y = player_y * -1
+
+        idx = math.floor((player_x-32)/32)
+        print(idx)
+        idx += 16*math.floor((player_y+224)/32)
+        print(idx)
+        if idx < 0:
+            idx = 0
+        if idx > 255:
+            idx = 255
+        if idx > len(terrain):
+            idx = len(terrain)-1
 
         # Top right
-        temp1 = pygame.Rect(math.floor(player_x/32)*32-32, 192, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp1)
+        if terrain[idx] != "":
+            temp1 = pygame.Rect(math.floor(player_x/32)*32-32, 192, 32, 32)
+            pygame.draw.rect(screen, (0, idx, 255), temp1)
+        idx +1   
         # Top center
-        temp2 = pygame.Rect(math.floor(player_x/32)*32, 192, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp2)
+        if terrain[idx] != "":
+            temp2 = pygame.Rect(math.floor(player_x/32)*32, 192, 32, 32)
+            pygame.draw.rect(screen, (0, 0, 255), temp2)
+        idx +1 
         # Top left
-        temp3 = pygame.Rect(math.floor(player_x/32)*32+32, 192, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp3)
+        if terrain[idx] != "":
+            temp3 = pygame.Rect(math.floor(player_x/32)*32+32, 192, 32, 32)
+            pygame.draw.rect(screen, (0, 0, 255), temp3)
+        idx +16 
         # Right
-        temp4 = pygame.Rect(math.floor(player_x/32)*32-32, 224, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp4)
+        if terrain[idx] != "":
+            temp4 = pygame.Rect(math.floor(player_x/32)*32-32, 224, 32, 32)
+            pygame.draw.rect(screen, (0, 0, 255), temp4)
+        idx +1 
         # Center
-        temp5 = pygame.Rect(math.floor(player_x/32)*32, 224, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp5)
+        if terrain[idx] != "":
+            temp5 = pygame.Rect(math.floor(player_x/32)*32, 224, 32, 32)
+            pygame.draw.rect(screen, (0, 0, 255), temp5)
+        idx +1 
         # Left
-        temp6 = pygame.Rect(math.floor(player_x/32)*32+32, 224, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp6)
+        if terrain[idx] != "":
+            temp6 = pygame.Rect(math.floor(player_x/32)*32+32, 224, 32, 32)
+            pygame.draw.rect(screen, (0, 0, 255), temp6)
+        idx +16 
         # Bottom right
-        temp7 = pygame.Rect(math.floor(player_x/32)*32-32, 256, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp7)
+        if terrain[idx] != "":
+            temp7 = pygame.Rect(math.floor(player_x/32)*32-32, 256, 32, 32)
+            pygame.draw.rect(screen, (0, 0, 255), temp7)
+        idx +1
         #Bottom center
-        temp8 = pygame.Rect(math.floor(player_x/32)*32, 256, 32, 32)
-        pygame.draw.rect(screen, (255, 0, 255), temp8)
+        if terrain[idx] != "":
+            temp8 = pygame.Rect(math.floor(player_x/32)*32, 256, 32, 32)
+            pygame.draw.rect(screen, (255, 0, 255), temp8)
+        idx +1
         # Bottom left
-        temp9 = pygame.Rect(math.floor(player_x/32)*32+32, 256, 32, 32)
-        pygame.draw.rect(screen, (0, 0, 255), temp9)
+        if terrain[idx] != "":
+            temp9 = pygame.Rect(math.floor(player_x/32)*32+32, 256, 32, 32)
+            pygame.draw.rect(screen, (0, 0, 255), temp9)
     #print(collision)
     
 print(len(terrain)/20)
@@ -133,13 +164,14 @@ while running:
     
     y += speedY * delta_time
     hitbox = pygame.Rect(x, 226, 32, 32)
-    collision = hitbox.colliderect(temp8)
+    collision = hitbox.colliderect(temp8 or temp9)
 
     #print(collision)
+    if speedY < 100:
+        speedY = speedY+1
     if collision:
         speedY = 0
-    elif speedY != 50:
-        speedY = speedY+1
+
         
     y_vel = font.render(f"Y vel: {speedY}", True, (255, 255, 255))
     screen.blit(first_block,(4,20))
@@ -165,10 +197,10 @@ while running:
             terrain = make_terrain()
             y = -480
             cam_y = y
-            speedY = 0
+            #speedY = 0
         if pressed[pygame.K_w]:
             print("w")
-            speedY = -10
+            speedY = -50
         if pressed[pygame.K_s]:
             print("s")
             y += 1
