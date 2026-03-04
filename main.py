@@ -9,8 +9,10 @@ screen = pygame.display.set_mode((640, 480))
 running = True
 clock = pygame.time.Clock()
 delta_time = 0.1
-y = 0
-moving = False
+x = 304
+y = -480
+cam_y = y
+collision = False
 
 # Temporary creation of stone
 stone = pygame.image.load('img/stone-v1.png').convert_alpha()
@@ -38,7 +40,10 @@ def make_terrain():
                 else:
                     terrain.append(dirt)
             else:
-                terrain.append(stone)
+                if height > 7 and random.randint(1,2) == 2:
+                    terrain.append("")
+                else:
+                    terrain.append(stone)
         height += 1
     
     return(terrain)
@@ -46,32 +51,42 @@ def make_terrain():
 # Drawing of terrain
 terrain = make_terrain()
 def draw_terrain(screen, terrain, player_y):
+    grounds = []
     idx = 0
     x = 0
     y = 0 - player_y
     length = len(terrain)/20
     for i in range(int(length)):
         for i in range(20):
-
-
-            screen.blit(terrain[idx], (x,y))
+            if terrain[idx] != "":
+                screen.blit(terrain[idx], (x,y))
+                ground = pygame.Rect(x, y, 32, 32)
+                pygame.draw.rect(screen, (0, 255, 0), ground)
+                grounds.append(ground)
             idx += 1
             x += 32
         x = 0
         y += 32
+    return(grounds)
+    
 print(len(terrain)/20)
 while running:
     screen.fill((0,0,0))
 
-    #screen.blit(stone, (0,0))
+    ground = draw_terrain(screen, terrain, cam_y)
+    screen.blit(player, (x, 224))
+    speedY = 50
+    if not collision:
+        y += speedY * delta_time
+    cam_y = y
 
-    draw_terrain(screen, terrain, y)
-    screen.blit(player, (240, 0))
-    if moving:
-        y += 50 * delta_time
-
-    hitbox = pygame.Rect(240, 0, 32, 32)
-    pygame.draw.rect(screen, (255, 0, 0), hitbox)
+    hitbox = pygame.Rect(x, 224, 32, 32)
+    #collision = hitbox.colliderect(ground)
+    #print(collision)
+    for i in range(len(ground)):
+        collision = hitbox.colliderect(ground[i])
+        print(collision)
+    pygame.draw.rect(screen, (255, 0, collision), hitbox)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -80,12 +95,22 @@ while running:
         if pressed[pygame.K_SPACE]:
             print("spaced")
             terrain = make_terrain()
+            y = -640
+            cam_y = y
         if pressed[pygame.K_w]:
             print("w")
             y -=1
+            cam_y = y
         if pressed[pygame.K_s]:
             print("s")
             y += 1
+            cam_y = y
+        if pressed[pygame.K_d]:
+            print("d")
+            x +=1
+        if pressed[pygame.K_a]:
+            print("a")
+            x -= 1
 
     pygame.display.flip()
 
