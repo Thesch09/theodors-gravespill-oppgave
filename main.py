@@ -22,6 +22,7 @@ moveSpeed = 80
 jumpStrength = 150
 jumpable = False
 digPower = 30
+money = 0
 # Player movement VARs
 keyDPressed = False
 keyAPressed = False
@@ -37,22 +38,62 @@ world_depth = 30
 font = pygame.font.Font(None, size=30)
 
 # Creation of stones
-stone = pygame.image.load('img/stoneV2.png').convert_alpha()
-stone = pygame.transform.scale(stone,
-                               (stone.get_width() * 2,
-                               stone.get_height() * 2))
-dirt = pygame.image.load('img/dirtV2.png').convert_alpha()
-dirt = pygame.transform.scale(dirt,
-                               (dirt.get_width() * 2,
-                               dirt.get_height() * 2))
-bluestone = pygame.image.load('img/bluestone.png').convert_alpha()
-bluestone = pygame.transform.scale(bluestone,
-                               (bluestone.get_width() * 2,
-                               bluestone.get_height() * 2))
-player = pygame.image.load('img/drillNormal.png').convert_alpha()
-player = pygame.transform.scale(player,
-                               (player.get_width() * 2,
-                               player.get_height() * 2))
+if True: # Only so that I can hide it in editor
+    stone = pygame.image.load('img/stoneV2.png').convert_alpha()
+    stone = pygame.transform.scale(stone,
+                                (stone.get_width() * 2,
+                                stone.get_height() * 2))
+    dirt = pygame.image.load('img/dirtV2.png').convert_alpha()
+    dirt = pygame.transform.scale(dirt,
+                                (dirt.get_width() * 2,
+                                dirt.get_height() * 2))
+    bluestone = pygame.image.load('img/bluestone.png').convert_alpha()
+    bluestone = pygame.transform.scale(bluestone,
+                                (bluestone.get_width() * 2,
+                                bluestone.get_height() * 2))
+    player = pygame.image.load('img/drillNormal.png').convert_alpha()
+    player = pygame.transform.scale(player,
+                                (player.get_width() * 2,
+                                player.get_height() * 2))
+    grass = pygame.image.load('img/grass.png').convert_alpha()
+    grass = pygame.transform.scale(grass,
+                                (grass.get_width() * 2,
+                                grass.get_height() * 2))
+    redstone = pygame.image.load('img/redstone.png').convert_alpha()
+    redstone = pygame.transform.scale(redstone,
+                                (redstone.get_width() * 2,
+                                redstone.get_height() * 2))
+    iron = pygame.image.load('img/iron.png').convert_alpha()
+    iron = pygame.transform.scale(iron,
+                                (iron.get_width() * 2,
+                                iron.get_height() * 2))
+    copper = pygame.image.load('img/copper.png').convert_alpha()
+    copper = pygame.transform.scale(copper,
+                                (copper.get_width() * 2,
+                                copper.get_height() * 2))
+    diamond = pygame.image.load('img/diamond.png').convert_alpha()
+    diamond = pygame.transform.scale(diamond,
+                                (diamond.get_width() * 2,
+                                diamond.get_height() * 2))
+    bismuth = pygame.image.load('img/bismuth.png').convert_alpha()
+    bismuth = pygame.transform.scale(bismuth,
+                                (bismuth.get_width() * 2,
+                                bismuth.get_height() * 2))
+    coal = pygame.image.load('img/coal.png').convert_alpha()
+    coal = pygame.transform.scale(coal,
+                                (coal.get_width() * 2,
+                                coal.get_height() * 2))
+    rainbowite = pygame.image.load('img/rainbowite.png').convert_alpha()
+    rainbowite = pygame.transform.scale(rainbowite,
+                                (rainbowite.get_width() * 2,
+                                rainbowite.get_height() * 2))
+
+digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
+digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
+digSFX3 = pygame.mixer.Sound('sfx/dig3.wav')
+digNoises = [digSFX1, digSFX2, digSFX3]
+oreBreak = pygame.mixer.Sound('sfx/oreBreak.wav')
+rockBreak = pygame.mixer.Sound('sfx/rockBreak.wav')
 
 
 
@@ -63,12 +104,30 @@ def draw_terrain(screen, terrain, camera):
     for i in terrain:
         if not i.mined:
             y = i.y + 600
-            if i.ore=='Stone':
+            # Rock type
+            if i.ore == 'Stone':
                 screen.blit(stone,(i.x,y+camera))
             if i.ore == 'Dirt':
                 screen.blit(dirt,(i.x,y+camera))
             if i.ore == 'Bluestone':
                 screen.blit(bluestone,(i.x,y+camera))
+            if i.ore == 'Redstone':
+                screen.blit(redstone,(i.x,y+camera))
+            # Ore type
+            if i.extra == 'Grass':
+                screen.blit(grass,(i.x,y+camera))
+            if i.extra == 'Iron':
+                screen.blit(iron,(i.x,y+camera))
+            if i.extra == 'Copper':
+                screen.blit(copper,(i.x,y+camera))
+            if i.extra == 'Coal':
+                screen.blit(coal,(i.x,y+camera))
+            if i.extra == 'Diamond':
+                screen.blit(diamond,(i.x,y+camera))
+            if i.extra == 'Bismuth':
+                screen.blit(bismuth,(i.x,y+camera))
+            if i.extra == 'Rainbowite':
+                screen.blit(rainbowite,(i.x,y+camera))
 
 def collide(playerX):
     hitbox = pygame.Rect(playerX, 224, 32, 32)
@@ -100,13 +159,21 @@ while running:
     hitbox = pygame.Rect(x, 226, 32, 32)
     redoGroundRects(terrain, cam_y)
     
-    for i in range(len(terrain)):
+    for i in range(len(terrain)): # Breaking of Blocks
         collision = digSquare.colliderect(terrain[i].rect)
         if collision and keyAnyPressed:
             terrain[i].hardness -= digPower * delta_time
             print("OI", terrain[i].hardness)
+            if random.randint(1,20) == 1:
+                digNoises[random.randint(0,2)].play()
+                print("sound")
             if terrain[i].hardness <= 0:
                 terrain[i].mined = True
+                money += terrain[i].value
+                if terrain[i].extra != '' and terrain[i].extra != 'Grass':
+                    oreBreak.play()
+                elif random.randint(1,3) == 1:
+                    rockBreak.play()
 
     speedY += gravity
     if speedY > jumpStrength:
@@ -114,8 +181,6 @@ while running:
 
     draw_terrain(screen, terrain, cam_y)
 
-    #for i in terrain:
-        #i.y -= speedY * delta_time
     y -= speedY * delta_time
     collision = collide(x)
     if not collision:
@@ -146,6 +211,7 @@ while running:
 
     playerX = font.render(f"{x}", True, (255,255,255))
     velY = font.render(f"{speedY}", True, (255,255,255))
+    velY = font.render(f"${money}", True, (255,255,0))
 
     hitbox = pygame.Rect(x, 224, 32, 32)
     if debug:
@@ -153,8 +219,9 @@ while running:
             pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
         pygame.draw.rect(screen, (255, 0, 0), hitbox)
         pygame.draw.rect(screen, (0, 0, 255), digSquare)
-        screen.blit(playerX, (4,4))
-        screen.blit(velY, (4,34))
+        screen.blit(playerX, (34,4))
+        screen.blit(velY, (4,64))
+    screen.blit(velY, (4,4))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
