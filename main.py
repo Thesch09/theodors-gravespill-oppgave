@@ -20,7 +20,7 @@ speedY = 0
 moveSpeed = 80
 jumpStrength = 150
 jumpable = False
-digPower = 10
+digPower = 30
 # Player movement VARs
 keyDPressed = False
 keyAPressed = False
@@ -144,14 +144,20 @@ while running:
     if not collision:
         jumpable = False
     if collision:
-        jumpable = True
-        speedY = 0
+        if not speedY < 0:
+            jumpable = True
         while collision:
-            for i in terrain:
-                i.y += 1
-            y += 1
+            if speedY < 0:
+                for i in terrain:
+                    i.y -= 1
+                y -= 1
+            else:
+                for i in terrain:
+                    i.y += 1
+                y += 1
             redoGroundRects(terrain)
             collision = collide(x)
+        speedY = 0
         for i in terrain:
             i.y -= 1
         y -= 1
@@ -242,7 +248,7 @@ while running:
     if keyWPressed:
         digSquare = pygame.Rect(x+8, 224-8, 16, 16)
         if jumpable:
-            speedY-= jumpStrength
+            speedY -= jumpStrength
         keyAnyPressed = True
     if keySPressed:
         digSquare = pygame.Rect(x+8, 224+24, 16, 16)
