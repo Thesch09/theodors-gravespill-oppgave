@@ -16,16 +16,19 @@ delta_time = 0.1
 x = 304
 y = -640
 speedY = 0
-moveSpeed = 4
-jumpStrength = 50
+moveSpeed = 80
+jumpStrength = 150
+jumpable = False
 stuck = False
 # Player movement VARs
 keyDPressed = False
 keyAPressed = False
 keyWPressed = False
+keySPressed = False
 # End of player VARs
 cam_y = y
 collision = False
+gravity = 5
 font = pygame.font.Font(None, size=30)
 
 # Temporary creation of stone
@@ -95,8 +98,6 @@ def collide(playerX):
     for i in range(len(terrain)):
         collision = hitbox.colliderect(terrain[i].rect)
         if collision:
-            colly += 1
-            print("HEY", colly)
             return collision
 def redoGroundRects(terrain):
     hitbox = pygame.Rect(x, 226, 32, 32)
@@ -112,29 +113,42 @@ def redoGroundRects(terrain):
     
 print(len(terrain)/20)
 hitbox = pygame.Rect(x, 224, 32, 32)
+digsquare = pygame.Rect(x, 224, 8, 8)
 while running:
     screen.fill((0,0,0))
     
     hitbox = pygame.Rect(x, 226, 32, 32)
     redoGroundRects(terrain)
     
-    
+    speedY += gravity
+    if speedY > jumpStrength:
+        speedY = jumpStrength
+
     draw_terrain(screen, terrain)
+
+    for i in terrain:
+        i.y -= speedY * delta_time
+    y -= speedY * delta_time
     collision = collide(x)
     if not collision:
+        jumpable = False
+    if collision:
+        jumpable = True
+        speedY = 0
+        while collision:
+            for i in terrain:
+                i.y += 1
+            y += 1
+            redoGroundRects(terrain)
+            collision = collide(x)
         for i in terrain:
             i.y -= 1
         y -= 1
-    collision = collide(x)
-    while collision:
-        for i in terrain:
-            i.y += 1
-        redoGroundRects(terrain)
-        collision = collide(x)
 
-    screen.blit(player, (x, 224))
+    screen.blit(player, (x, 223))
 
-    cam_y = y
+    if y > cam_y + 4 or y < cam_y - 4:
+        cam_y = y
 
     playerX = font.render(f"{x}", True, (255,255,255))
     velY = font.render(f"{speedY}", True, (255,255,255))
@@ -142,7 +156,7 @@ while running:
     screen.blit(velY, (4,34))
 
     hitbox = pygame.Rect(x, 224, 32, 32)
-    #pygame.draw.rect(screen, (255, 0, collision), hitbox)
+    pygame.draw.rect(screen, (0, 0, 255), digsquare)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -154,46 +168,58 @@ while running:
                 print("D down")
                 keyDPressed = True
             if event.key == pygame.K_a:
-                print("a down")
+                print("A down")
                 keyAPressed = True
             if event.key == pygame.K_w:
-                print("w down")
+                print("W down")
                 keyWPressed = True
+            if event.key == pygame.K_s:
+                print("S down")
+                keySPressed = True
         #Checking for when a button is released
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d:
                 print("D up")
                 keyDPressed = False
             if event.key == pygame.K_a:
-                print("a up")
+                print("A up")
                 keyAPressed = False
             if event.key == pygame.K_w:
-                print("w up")
+                print("W up")
                 keyWPressed = False
+            if event.key == pygame.K_s:
+                print("S up")
+                keySPressed = False
         
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_SPACE]:
+            pass
             print("spaced")
             terrain = make_terrain()
             y = -480
             cam_y = y
             speedY = 0
-        if pressed[pygame.K_s]:
-            print("s")
-            y += 1
-            cam_y = y
     if keyDPressed:
-        x += moveSpeed
+        x += moveSpeed * delta_time
         collision = collide(x)
+        digsquare = pygame.Rect(x+24, 224+8, 16, 16)
         while collision:
             x -= 1
             collision = collide(x)
     if keyAPressed:
-        x -= moveSpeed
+        x -= moveSpeed * delta_time
         collision = collide(x)
+        digsquare = pygame.Rect(x-8, 224+8, 16, 16)
         while collision:
             x += 1
             collision = collide(x)
+    if keyWPressed:
+        digsquare = pygame.Rect(x+8, 224-8, 16, 16)
+        if jumpable:
+            speedY-= jumpStrength
+    if keySPressed:
+        digsquare = pygame.Rect(x+8, 224+24, 16, 16)
+
 
     if x < 0:
         x = 0
