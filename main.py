@@ -28,22 +28,28 @@ keyAPressed = False
 keyWPressed = False
 keySPressed = False
 keyAnyPressed = False
+degrees = 0
 # End of player VARs
 cam_y = y
 collision = False
 gravity = 5
+world_depth = 30
 font = pygame.font.Font(None, size=30)
 
-# Temporary creation of stone
-stone = pygame.image.load('img/stone-v1.png').convert_alpha()
+# Creation of stones
+stone = pygame.image.load('img/stoneV2.png').convert_alpha()
 stone = pygame.transform.scale(stone,
                                (stone.get_width() * 2,
                                stone.get_height() * 2))
-dirt = pygame.image.load('img/dirt-v1.png').convert_alpha()
+dirt = pygame.image.load('img/dirtV2.png').convert_alpha()
 dirt = pygame.transform.scale(dirt,
                                (dirt.get_width() * 2,
                                dirt.get_height() * 2))
-player = pygame.image.load('img/pixil-frame-0 (24).png').convert_alpha()
+bluestone = pygame.image.load('img/bluestone.png').convert_alpha()
+bluestone = pygame.transform.scale(bluestone,
+                               (bluestone.get_width() * 2,
+                               bluestone.get_height() * 2))
+player = pygame.image.load('img/drillNormal.png').convert_alpha()
 player = pygame.transform.scale(player,
                                (player.get_width() * 2,
                                player.get_height() * 2))
@@ -51,15 +57,18 @@ player = pygame.transform.scale(player,
 
 
 # Drawing of terrain
-terrain = make_terrain()
+terrain = make_terrain(world_depth)
+print(world_depth)
 def draw_terrain(screen, terrain, camera):
     for i in terrain:
-        if not i.mined and i.y<640 and i.y>-32:
+        if not i.mined:
             y = i.y + 600
             if i.ore=='Stone':
                 screen.blit(stone,(i.x,y+camera))
             if i.ore == 'Dirt':
                 screen.blit(dirt,(i.x,y+camera))
+            if i.ore == 'Bluestone':
+                screen.blit(bluestone,(i.x,y+camera))
 
 def collide(playerX):
     hitbox = pygame.Rect(playerX, 224, 32, 32)
