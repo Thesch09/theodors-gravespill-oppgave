@@ -11,9 +11,18 @@ screen = pygame.display.set_mode((640, 480))
 running = True
 clock = pygame.time.Clock()
 delta_time = 0.1
+# Player VARs
 x = 304
-y = -480
+y = -640
 speedY = 0
+moveSpeed = 4
+jumpStrength = 50
+stuck = False
+# Player movement VARs
+keyDPressed = False
+keyAPressed = False
+keyWPressed = False
+# End of player VARs
 cam_y = y
 collision = False
 font = pygame.font.Font(None, size=30)
@@ -48,17 +57,22 @@ def make_terrain():
             terrain.append(block)
             terrain[-1].x=i*32
             terrain[-1].y=350+(height*32)
-            terrain[-1].rect=pygame.Rect(i,350,32,32)
-            if height < 3:
-                if height == 2 and random.randint(1,2) == 2:
-                    terrain[-1].ore='Stone'
-                else:
-                    terrain[-1].ore='Dirt'
+            terrain[-1].rect=pygame.Rect(terrain[-1].x,terrain[-1].y,32,32)
+            if i <= 1 and height == 0:
+                terrain[-1].ore=''
+                terrain[-1].mined=True
             else:
-                if height > 7 and random.randint(1,2) == 2:
-                    terrain[-1].ore=''
+                if height < 3:
+                    if height == 2 and random.randint(1,2) == 2:
+                        terrain[-1].ore='Stone'
+                    else:
+                        terrain[-1].ore='Dirt'
                 else:
-                    terrain[-1].ore='Stone'
+                    if height > 7 and random.randint(1,2) == 2:
+                        terrain[-1].ore=''
+                        terrain[-1].mined=True
+                    else:
+                        terrain[-1].ore='Stone'
         height += 1
     
     return(terrain)
@@ -68,11 +82,21 @@ terrain = make_terrain()
 def draw_terrain(screen, terrain):
     for i in terrain:
         if not i.mined and i.y<640 and i.y>-32:
+            y = i.y
             if i.ore=='Stone':
                 screen.blit(stone,(i.x,i.y))
             if i.ore == 'Dirt':
                 screen.blit(dirt,(i.x,i.y))
 
+def collide(playerX):
+    hitbox = pygame.Rect(playerX, 224, 32, 32)
+    colly = 1
+    for i in range(len(terrain)):
+        collision = hitbox.colliderect(terrain[i].rect)
+        if collision:
+            colly += 1
+            print("HEY", colly)
+            return collision
 
 
     
@@ -80,64 +104,101 @@ print(len(terrain)/20)
 hitbox = pygame.Rect(x, 224, 32, 32)
 while running:
     screen.fill((0,0,0))
-
-    draw_terrain(screen, terrain)
-    screen.blit(player, (x, 224))
     
     hitbox = pygame.Rect(x, 226, 32, 32)
-    for i in terrain:
-        pygame.draw.rect(screen, (0, 255, 0), i.rect)
-        collision = hitbox.colliderect(i.rect)
+    for i in range(len(terrain)):
+        if not terrain[i].mined:
+            terrain[i].rect = pygame.Rect(terrain[i].x,terrain[i].y,32,32)  # This line causes the hitboxes to appear where the terrain is visually
+        #pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
+        collision = hitbox.colliderect(terrain[i].rect)
         if collision:
             break
+    
+    
+    draw_terrain(screen, terrain)
+    for i in terrain:
+        i.y -= 1
+    y -= 1
 
-    if not collision:
-        for i in terrain:
-            i.y -= 1
-        y -= 1
+    screen.blit(player, (x, 224))
 
-
-    #print(collision)
-    #if speedY < 100:
-        #speedY = speedY+1
-    #if #collision:
-        #speedY = 0
+    collision = collide(x)
+    if collision:
+        y += speedY
+        speedY = 0
+    else:
+        speedY += 1
+    if speedY > jumpStrength * 2:
+        speedY = jumpStrength * 2
 
     cam_y = y
 
+    playerX = font.render(f"{x}", True, (255,255,255))
+    velY = font.render(f"{speedY}", True, (255,255,255))
+    screen.blit(playerX, (4,4))
+    screen.blit(velY, (4,34))
+
     hitbox = pygame.Rect(x, 224, 32, 32)
-    
-    #for i in range(len(ground)):
-        #collision = hitbox.colliderect(ground[i])
-        #print(collision)
-    pygame.draw.rect(screen, (255, 0, collision), hitbox)
+    #pygame.draw.rect(screen, (255, 0, collision), hitbox)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        # Checking for when a button is pressed
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_d:
+                print("D down")
+                keyDPressed = True
+            if event.key == pygame.K_a:
+                print("a down")
+                keyAPressed = True
+            if event.key == pygame.K_w:
+                print("w down")
+                keyWPressed = True
+        #Checking for when a button is released
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_d:
+                print("D up")
+                keyDPressed = False
+            if event.key == pygame.K_a:
+                print("a up")
+                keyAPressed = False
+            if event.key == pygame.K_w:
+                print("w up")
+                keyWPressed = False
+        
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_SPACE]:
             print("spaced")
             terrain = make_terrain()
             y = -480
             cam_y = y
-            #speedY = 0
-        if pressed[pygame.K_w]:
-            print("w")
-            speedY = -50
+            speedY = 0
         if pressed[pygame.K_s]:
             print("s")
             y += 1
             cam_y = y
-        if pressed[pygame.K_d]:
-            print("d")
-            x +=1
-        if pressed[pygame.K_a]:
-            print("a")
+    if keyDPressed:
+        x += moveSpeed
+        collision = collide(x)
+        while collision:
             x -= 1
+            collision = collide(x)
+    if keyAPressed:
+        x -= moveSpeed
+        collision = collide(x)
+        while collision:
+            x += 1
+            collision = collide(x)
 
+    if x < 0:
+        x = 0
+    if x > 608:
+        x = 608
+
+    # end stuff
     pygame.display.flip()
-
     delta_time = clock.tick(60) / 1000
     delta_time = max(0.001, min((0.1, delta_time)))
 
