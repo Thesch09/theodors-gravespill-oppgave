@@ -212,6 +212,10 @@ while running:
             x -= 1
             collision = collide(x)
         keyAnyPressed = True
+        player = pygame.transform.rotate(player, degrees*-1)
+        degrees = -90
+        player = pygame.transform.rotate(player, degrees)
+
     if keyAPressed:
         x -= moveSpeed * delta_time
         collision = collide(x)
@@ -220,14 +224,24 @@ while running:
             x += 1
             collision = collide(x)
         keyAnyPressed = True
+        player = pygame.transform.rotate(player, degrees*-1)
+        degrees = 90
+        player = pygame.transform.rotate(player, degrees)
+
     if keyWPressed:
         digSquare = pygame.Rect(x+8, 224-8, 16, 16)
         if jumpable:
             speedY -= jumpStrength
         keyAnyPressed = True
+        player = pygame.transform.rotate(player, degrees*-1)
+        degrees = 0
+        player = pygame.transform.rotate(player, degrees)
     if keySPressed:
         digSquare = pygame.Rect(x+8, 224+24, 16, 16)
         keyAnyPressed = True
+        player = pygame.transform.rotate(player, degrees*-1)
+        degrees = 180
+        player = pygame.transform.rotate(player, degrees)
 
 
     if x < 0:
