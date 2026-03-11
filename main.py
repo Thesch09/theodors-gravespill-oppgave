@@ -52,14 +52,14 @@ player = pygame.transform.scale(player,
 
 # Drawing of terrain
 terrain = make_terrain()
-def draw_terrain(screen, terrain):
+def draw_terrain(screen, terrain, camera):
     for i in terrain:
         if not i.mined and i.y<640 and i.y>-32:
-            y = i.y
+            y = i.y + 600
             if i.ore=='Stone':
-                screen.blit(stone,(i.x,i.y))
+                screen.blit(stone,(i.x,y+camera))
             if i.ore == 'Dirt':
-                screen.blit(dirt,(i.x,i.y))
+                screen.blit(dirt,(i.x,y+camera))
 
 def collide(playerX):
     hitbox = pygame.Rect(playerX, 224, 32, 32)
@@ -68,12 +68,13 @@ def collide(playerX):
         collision = hitbox.colliderect(terrain[i].rect)
         if collision:
             return collision
-def redoGroundRects(terrain):
+def redoGroundRects(terrain, camera):
     hitbox = pygame.Rect(x, 226, 32, 32)
     for i in range(len(terrain)):
+        y = terrain[i].y + 600 + camera
         terrain[i].rect = pygame.Rect(0,0,32,32)
         if not terrain[i].mined:
-            terrain[i].rect = pygame.Rect(terrain[i].x,terrain[i].y,32,32)  # This line causes the hitboxes to appear where the terrain is visually
+            terrain[i].rect = pygame.Rect(terrain[i].x, y, 32, 32)  # This line causes the hitboxes to appear where the terrain is visually
         #pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
         collision = hitbox.colliderect(terrain[i].rect)
         if collision:
@@ -88,7 +89,7 @@ while running:
     screen.fill((0,0,0))
     
     hitbox = pygame.Rect(x, 226, 32, 32)
-    redoGroundRects(terrain)
+    redoGroundRects(terrain, cam_y)
     
     for i in range(len(terrain)):
         collision = digSquare.colliderect(terrain[i].rect)
@@ -102,10 +103,10 @@ while running:
     if speedY > jumpStrength:
         speedY = jumpStrength
 
-    draw_terrain(screen, terrain)
+    draw_terrain(screen, terrain, cam_y)
 
-    for i in terrain:
-        i.y -= speedY * delta_time
+    #for i in terrain:
+        #i.y -= speedY * delta_time
     y -= speedY * delta_time
     collision = collide(x)
     if not collision:
@@ -115,36 +116,36 @@ while running:
             jumpable = True
         while collision:
             if speedY < 0:
-                for i in terrain:
-                    i.y -= 1
+                #for i in terrain:
+                    #i.y -= 1
                 y -= 1
             else:
-                for i in terrain:
-                    i.y += 1
+                #for i in terrain:
+                    #i.y += 1
                 y += 1
-            redoGroundRects(terrain)
+            cam_y = y
+            redoGroundRects(terrain, cam_y)
             collision = collide(x)
         speedY = 0
-        for i in terrain:
-            i.y -= 1
+        #for i in terrain:
+            #i.y -= 1
         y -= 1
 
     screen.blit(player, (x, 223))
 
-    if y > cam_y + 4 or y < cam_y - 4:
-        cam_y = y
+    cam_y = y
 
     playerX = font.render(f"{x}", True, (255,255,255))
     velY = font.render(f"{speedY}", True, (255,255,255))
-    screen.blit(playerX, (4,4))
-    screen.blit(velY, (4,34))
 
     hitbox = pygame.Rect(x, 224, 32, 32)
     if debug:
-        pygame.draw.rect(screen, (0, 0, 255), digSquare)
         for i in range(len(terrain)):
             pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
         pygame.draw.rect(screen, (255, 0, 0), hitbox)
+        pygame.draw.rect(screen, (0, 0, 255), digSquare)
+        screen.blit(playerX, (4,4))
+        screen.blit(velY, (4,34))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -171,6 +172,11 @@ while running:
                 else:
                     debug = True
                     print("DEBUG ON")
+            if event.key == pygame.K_SPACE:
+                speedY = 0
+                y = -640
+                cam_y = y
+                x = 304
 
         #Checking for when a button is released
         if event.type == pygame.KEYUP:
