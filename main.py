@@ -7,7 +7,8 @@ import time
 pygame.init()
 
 # Set up
-screen = pygame.display.set_mode((640, 480))
+flags = pygame.SCALED  |  pygame.RESIZABLE
+screen = pygame.display.set_mode((640, 480), flags)
 running = True
 clock = pygame.time.Clock()
 delta_time = 0.1
@@ -97,6 +98,15 @@ def collide(playerX):
             colly += 1
             print("HEY", colly)
             return collision
+def redoGroundRects(terrain):
+    hitbox = pygame.Rect(x, 226, 32, 32)
+    for i in range(len(terrain)):
+        if not terrain[i].mined:
+            terrain[i].rect = pygame.Rect(terrain[i].x,terrain[i].y,32,32)  # This line causes the hitboxes to appear where the terrain is visually
+        #pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
+        collision = hitbox.colliderect(terrain[i].rect)
+        if collision:
+            break
 
 
     
@@ -106,30 +116,23 @@ while running:
     screen.fill((0,0,0))
     
     hitbox = pygame.Rect(x, 226, 32, 32)
-    for i in range(len(terrain)):
-        if not terrain[i].mined:
-            terrain[i].rect = pygame.Rect(terrain[i].x,terrain[i].y,32,32)  # This line causes the hitboxes to appear where the terrain is visually
-        #pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
-        collision = hitbox.colliderect(terrain[i].rect)
-        if collision:
-            break
+    redoGroundRects(terrain)
     
     
     draw_terrain(screen, terrain)
-    for i in terrain:
-        i.y -= 1
-    y -= 1
+    collision = collide(x)
+    if not collision:
+        for i in terrain:
+            i.y -= 1
+        y -= 1
+    collision = collide(x)
+    while collision:
+        for i in terrain:
+            i.y += 1
+        redoGroundRects(terrain)
+        collision = collide(x)
 
     screen.blit(player, (x, 224))
-
-    collision = collide(x)
-    if collision:
-        y += speedY
-        speedY = 0
-    else:
-        speedY += 1
-    if speedY > jumpStrength * 2:
-        speedY = jumpStrength * 2
 
     cam_y = y
 
