@@ -12,6 +12,7 @@ screen = pygame.display.set_mode((640, 480), flags)
 running = True
 clock = pygame.time.Clock()
 delta_time = 0.1
+debug = False
 # Player VARs
 x = 304
 y = -640
@@ -19,12 +20,13 @@ speedY = 0
 moveSpeed = 80
 jumpStrength = 150
 jumpable = False
-stuck = False
+digPower = 10
 # Player movement VARs
 keyDPressed = False
 keyAPressed = False
 keyWPressed = False
 keySPressed = False
+keyAnyPressed = False
 # End of player VARs
 cam_y = y
 collision = False
@@ -102,6 +104,7 @@ def collide(playerX):
 def redoGroundRects(terrain):
     hitbox = pygame.Rect(x, 226, 32, 32)
     for i in range(len(terrain)):
+        terrain[i].rect = pygame.Rect(0,0,32,32)
         if not terrain[i].mined:
             terrain[i].rect = pygame.Rect(terrain[i].x,terrain[i].y,32,32)  # This line causes the hitboxes to appear where the terrain is visually
         #pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
@@ -113,13 +116,21 @@ def redoGroundRects(terrain):
     
 print(len(terrain)/20)
 hitbox = pygame.Rect(x, 224, 32, 32)
-digsquare = pygame.Rect(x, 224, 8, 8)
+digSquare = pygame.Rect(x, 224, 8, 8)
 while running:
     screen.fill((0,0,0))
     
     hitbox = pygame.Rect(x, 226, 32, 32)
     redoGroundRects(terrain)
     
+    for i in range(len(terrain)):
+        collision = digSquare.colliderect(terrain[i].rect)
+        if collision and keyAnyPressed:
+            terrain[i].hardness -= digPower * delta_time
+            print("OI", terrain[i].hardness)
+            if terrain[i].hardness <= 0:
+                terrain[i].mined = True
+
     speedY += gravity
     if speedY > jumpStrength:
         speedY = jumpStrength
@@ -156,7 +167,11 @@ while running:
     screen.blit(velY, (4,34))
 
     hitbox = pygame.Rect(x, 224, 32, 32)
-    pygame.draw.rect(screen, (0, 0, 255), digsquare)
+    if debug:
+        pygame.draw.rect(screen, (0, 0, 255), digSquare)
+        for i in range(len(terrain)):
+            pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
+        pygame.draw.rect(screen, (255, 0, 0), hitbox)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -176,6 +191,13 @@ while running:
             if event.key == pygame.K_s:
                 print("S down")
                 keySPressed = True
+            if event.key == pygame.K_F3:
+                if debug:
+                    debug = False
+                    print("DEBUG OFF")
+                else:
+                    debug = True
+                    print("DEBUG ON")
         #Checking for when a button is released
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d:
@@ -199,26 +221,32 @@ while running:
             y = -480
             cam_y = y
             speedY = 0
+    
+    keyAnyPressed = False
     if keyDPressed:
         x += moveSpeed * delta_time
         collision = collide(x)
-        digsquare = pygame.Rect(x+24, 224+8, 16, 16)
+        digSquare = pygame.Rect(x+24, 224+8, 16, 16)
         while collision:
             x -= 1
             collision = collide(x)
+        keyAnyPressed = True
     if keyAPressed:
         x -= moveSpeed * delta_time
         collision = collide(x)
-        digsquare = pygame.Rect(x-8, 224+8, 16, 16)
+        digSquare = pygame.Rect(x-8, 224+8, 16, 16)
         while collision:
             x += 1
             collision = collide(x)
+        keyAnyPressed = True
     if keyWPressed:
-        digsquare = pygame.Rect(x+8, 224-8, 16, 16)
+        digSquare = pygame.Rect(x+8, 224-8, 16, 16)
         if jumpable:
             speedY-= jumpStrength
+        keyAnyPressed = True
     if keySPressed:
-        digsquare = pygame.Rect(x+8, 224+24, 16, 16)
+        digSquare = pygame.Rect(x+8, 224+24, 16, 16)
+        keyAnyPressed = True
 
 
     if x < 0:
