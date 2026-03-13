@@ -35,7 +35,13 @@ keyAPressed = False
 keyWPressed = False
 keySPressed = False
 keyAnyPressed = False
+keySpacePressed = False
 degrees = 0
+shopCursorSlot = 0
+shopTab = "upgrades"
+moveShop = 0
+# Player upgrade costs
+heartCost = 100
 # End of player VARs
 cam_y = y
 collision = False
@@ -45,6 +51,29 @@ font = pygame.font.Font(None, size=30)
 
 # Creation of stones
 if True: # Only so that I can hide it in editor
+    # PLAYER VISUALS
+    drill = pygame.image.load('img/drillNormalV2.png').convert_alpha()
+    drill = pygame.transform.scale(drill,
+                                (drill.get_width() * 2,
+                                drill.get_height() * 2))
+    player = pygame.image.load('img/drillBodyOrange.png').convert_alpha()
+    player = pygame.transform.scale(player,
+                                (player.get_width() * 2,
+                                player.get_height() * 2))
+    break1 = pygame.image.load('img/break1.png').convert_alpha()
+    break1 = pygame.transform.scale(break1,
+                                (break1.get_width() * 2,
+                                break1.get_height() * 2))
+    break2 = pygame.image.load('img/break2.png').convert_alpha()
+    break2 = pygame.transform.scale(break2,
+                                (break2.get_width() * 2,
+                                break2.get_height() * 2))
+    break3 = pygame.image.load('img/break3.png').convert_alpha()
+    break3 = pygame.transform.scale(break3,
+                                (break3.get_width() * 2,
+                                break3.get_height() * 2))
+    
+    # Ground
     stone = pygame.image.load('img/stoneV2.png').convert_alpha()
     stone = pygame.transform.scale(stone,
                                 (stone.get_width() * 2,
@@ -57,14 +86,6 @@ if True: # Only so that I can hide it in editor
     bluestone = pygame.transform.scale(bluestone,
                                 (bluestone.get_width() * 2,
                                 bluestone.get_height() * 2))
-    drill = pygame.image.load('img/drillNormalV2.png').convert_alpha()
-    drill = pygame.transform.scale(drill,
-                                (drill.get_width() * 2,
-                                drill.get_height() * 2))
-    player = pygame.image.load('img/drillBodyOrange.png').convert_alpha()
-    player = pygame.transform.scale(player,
-                                (player.get_width() * 2,
-                                player.get_height() * 2))
     grass = pygame.image.load('img/grass.png').convert_alpha()
     grass = pygame.transform.scale(grass,
                                 (grass.get_width() * 2,
@@ -73,6 +94,8 @@ if True: # Only so that I can hide it in editor
     redstone = pygame.transform.scale(redstone,
                                 (redstone.get_width() * 2,
                                 redstone.get_height() * 2))
+    
+    # Ores
     iron = pygame.image.load('img/iron.png').convert_alpha()
     iron = pygame.transform.scale(iron,
                                 (iron.get_width() * 2,
@@ -97,22 +120,40 @@ if True: # Only so that I can hide it in editor
     rainbowite = pygame.transform.scale(rainbowite,
                                 (rainbowite.get_width() * 2,
                                 rainbowite.get_height() * 2))
+    
+    # GUI
     heart = pygame.image.load('img/heart.png').convert_alpha()
     heart = pygame.transform.scale(heart,
                                 (heart.get_width() * 2,
                                 heart.get_height() * 2))
-    break1 = pygame.image.load('img/break1.png').convert_alpha()
-    break1 = pygame.transform.scale(break1,
-                                (break1.get_width() * 2,
-                                break1.get_height() * 2))
-    break2 = pygame.image.load('img/break2.png').convert_alpha()
-    break2 = pygame.transform.scale(break2,
-                                (break2.get_width() * 2,
-                                break2.get_height() * 2))
-    break3 = pygame.image.load('img/break3.png').convert_alpha()
-    break3 = pygame.transform.scale(break3,
-                                (break3.get_width() * 2,
-                                break3.get_height() * 2))
+    digPowerGUI = pygame.image.load('img/digPower.png').convert_alpha()
+    digPowerGUI = pygame.transform.scale(digPowerGUI,
+                                (digPowerGUI.get_width() * 2,
+                                digPowerGUI.get_height() * 2))
+    digPowerUnique = pygame.image.load('img/digPowerUnique.png').convert_alpha()
+    digPowerUnique = pygame.transform.scale(digPowerUnique,
+                                (digPowerUnique.get_width() * 2,
+                                digPowerUnique.get_height() * 2))
+    heartUnique = pygame.image.load('img/heartUnique.png').convert_alpha()
+    heartUnique = pygame.transform.scale(heartUnique,
+                                (heartUnique.get_width() * 2,
+                                heartUnique.get_height() * 2))
+    shopBuy = pygame.image.load('img/shopBuy.png').convert_alpha()
+    shopBuy = pygame.transform.scale(shopBuy,
+                                (shopBuy.get_width() * 2,
+                                shopBuy.get_height() * 2))
+    shopBuyUnique = pygame.image.load('img/shopBuyUnique.png').convert_alpha()
+    shopBuyUnique = pygame.transform.scale(shopBuyUnique,
+                                (shopBuyUnique.get_width() * 2,
+                                shopBuyUnique.get_height() * 2))
+    shopPoor = pygame.image.load('img/shopPoor.png').convert_alpha()
+    shopPoor = pygame.transform.scale(shopPoor,
+                                (shopPoor.get_width() * 2,
+                                shopPoor.get_height() * 2))
+    shopButtonSelect = pygame.image.load('img/shopButtonSelect.png').convert_alpha()
+    shopButtonSelect = pygame.transform.scale(shopButtonSelect,
+                                (shopButtonSelect.get_width() * 2,
+                                shopButtonSelect.get_height() * 2))    
 
 digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
 digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
@@ -186,8 +227,21 @@ def redoGroundRects(terrain, camera):
         if collision:
             break
 
+class shopItem:
+    def __init__(self, cost, flavour, sprite, tab, slot, priceIncrease):
+        self.cost = cost
+        self.flavour = flavour
+        self.sprite = sprite
+        self.tab = tab
+        self.slot = slot
+        self.priceIncrease = priceIncrease
 
-    
+heartShop = shopItem(100, "Increases maximum HP by 5.", heart, "upgrades", 0, 10)
+digPowerShop = shopItem(25, "Increases Dig Power by 5.", digPowerGUI, "upgrades", 1, 3)
+
+shop = [heartShop, digPowerShop]
+
+
 print(len(terrain)/20)
 hitbox = pygame.Rect(x+4, 224, 24, 32)
 digSquare = pygame.Rect(x, 224, 8, 8)
@@ -219,7 +273,8 @@ while running:
             if terrain[i].health <= 0:
                 terrain[i].mined = True
                 money += terrain[i].value
-                health -= terrain[i].damage
+                if not debug:
+                    health -= terrain[i].damage
                 if terrain[i].extra != '' and terrain[i].extra != 'Grass':
                     oreBreak.play()
                 elif random.randint(1,3) == 1:
@@ -263,6 +318,7 @@ while running:
     playerY = font.render(f"Y: {y}", True, (255,255,255))
     moneyText = font.render(f"${money}", True, (255,255,0))
     healthText = font.render(f"{health}/{maxHealth}", True, (255,0,0))
+    heartFlavour = font.render(f"Increases maximum HP by 5. Cost: {heartCost}", True, (255,255,255))
 
     hitbox = pygame.Rect(x+4, 224, 24, 32)
     if debug:
@@ -299,15 +355,18 @@ while running:
                 else:
                     debug = True
                     print("DEBUG ON")
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE and controlls == "move":
                 speedY = 0
                 y = -640
                 cam_y = y
                 x = 304
+            if event.key == pygame.K_SPACE and controlls == "shop":
+                keySpacePressed = True
             if event.key == pygame.K_ESCAPE:
                 if shopOverlay:
                     shopOverlay = False
                     controlls = "move"
+                    keySpacePressed = False
                 else:
                     shopOverlay = True
                     controlls = "shop"
@@ -326,9 +385,22 @@ while running:
             if event.key == pygame.K_s:
                 print("S up")
                 keySPressed = False
+            if event.key == pygame.K_SPACE and controlls == "shop":
+                keySpacePressed = False
         
-    
-    if controlls == "move":
+    shopTemp = pygame.Rect(32, 32, 576, 416)
+    shopTempOutline = pygame.Rect(30, 30, 580, 420)
+    if shopOverlay:
+        pygame.draw.rect(screen, (50, 50, 50), shopTempOutline)
+        pygame.draw.rect(screen, (122, 122, 122), shopTemp)
+        screen.blit(moneyText, (36, 36))
+    else:
+        screen.blit(moneyText, (4,34))
+    screen.blit(heart, (4,4))
+    screen.blit(healthText, (36, 10))
+
+    keyAnyPressed = False
+    if controlls == "move": # For movement, duh :) 
         if keyDPressed:
             x += moveSpeed * delta_time
             collision = collide(x)
@@ -376,6 +448,38 @@ while running:
             player = pygame.transform.rotate(player, degrees)
             drill = pygame.transform.rotate(drill, degrees)
 
+    if controlls == "shop": # For when in the shop GUI
+        for i in shop:
+            shopText = font.render(f"{i.flavour} Cost: {i.cost}", True, (255,255,255))
+            if i.tab == shopTab:
+                screen.blit(i.sprite, (32, 64+36*i.slot))
+                screen.blit(shopText, (64, 72+36*i.slot))
+                if money >= i.cost:
+                    screen.blit(shopBuy, (540, 64+36*i.slot))
+                else:
+                    screen.blit(shopPoor, (540, 64+36*i.slot))
+        '''
+        if shopTab == "upgrades":
+            screen.blit(heart, (32,64))
+            screen.blit(heartFlavour, (64,72))
+            if money >= heartCost:
+                screen.blit(shopBuy, (540, 64))
+            else:
+                screen.blit(shopPoor, (540, 64))
+        '''
+        screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
+        if keySpacePressed:
+            print("SHOP")
+        if moveShop == 1:
+            if keySPressed:
+                shopCursorSlot += 1
+            if keyWPressed:
+                shopCursorSlot -= 1
+            if shopCursorSlot < 0:
+                shopCursorSlot = 4
+            if shopCursorSlot > 4:
+                shopCursorSlot = 0
+
     if x < 0:
         x = 0
     if x > 608:
@@ -398,17 +502,10 @@ while running:
                 controlls = "move"
                 x = 304
                 y = -640
-
-    shopTemp = pygame.Rect(32, 32, 576, 416)
-    shopTempOutline = pygame.Rect(30, 30, 580, 420)
-    if shopOverlay:
-        pygame.draw.rect(screen, (50, 50, 50), shopTempOutline)
-        pygame.draw.rect(screen, (122, 122, 122), shopTemp)
-        screen.blit(moneyText, (36, 36))
-    else:
-        screen.blit(moneyText, (4,34))
-    screen.blit(heart, (4,4))
-    screen.blit(healthText, (36, 10))
+    
+    moveShop += 1
+    if moveShop > 3:
+        moveShop = 0
 
     # end stuff
     pygame.display.flip()

@@ -75,10 +75,10 @@ def make_terrain(depth):
                 terrain[-1].hardness += 10
                 terrain[-1].value += 2
                 terrain[-1].damage += 1
-            if height > 3 and height < 50 and random.randint(1,20) == 1:
+            if height > 15 and height < 50 and random.randint(1,20) == 1:
                 terrain[-1].extra = 'Iron'
                 terrain[-1].hardness += 20
-                terrain[-1].value += 5
+                terrain[-1].value += 7
                 terrain[-1].damage += 1
 
             # Extra health the deeper you go
