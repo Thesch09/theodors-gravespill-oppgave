@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 # Generate the terrain
 def make_terrain(depth):
     terrain = []
@@ -15,6 +16,8 @@ def make_terrain(depth):
                 mined = False
                 extra = ''
                 value = 1
+                damage = 0
+                health = hardness
             terrain.append(block)
             terrain[-1].x = i*32
             terrain[-1].y = 350+height*32
@@ -24,32 +27,44 @@ def make_terrain(depth):
             if height < 3:
                 terrain[-1].ore = 'Dirt'
                 terrain[-1].value = 1
+                terrain[-1].damage = 0
             if height == 2 and random.randint(1,2) == 2:
                 terrain[-1].ore = 'Stone'
                 terrain[-1].hardness = 25
                 terrain[-1].extra = ''
                 terrain[-1].value = 2
+                terrain[-1].damage = 1
             if height >= 3:
                 terrain[-1].ore = 'Stone'
                 terrain[-1].hardness = 25
                 terrain[-1].extra = ''
                 terrain[-1].value = 2
+                terrain[-1].damage = 1
             if height > 25:
                 if random.randint(1,2) == 2:
                     terrain[-1].ore = 'Bluestone'
                     terrain[-1].hardness = 50
                     terrain[-1].extra = ''
                     terrain[-1].value = 7
+                    terrain[-1].damage = 3
                 else:
                     terrain[-1].ore = 'Stone'
                     terrain[-1].hardness = 25
                     terrain[-1].extra = ''
                     terrain[-1].value = 2
+                    terrain[-1].damage = 3
             if height > 27:
-                    terrain[-1].ore = 'Bluestone'
-                    terrain[-1].hardness = 50
-                    terrain[-1].extra = ''
-                    terrain[-1].value = 7
+                terrain[-1].ore = 'Bluestone'
+                terrain[-1].hardness = 50
+                terrain[-1].extra = ''
+                terrain[-1].value = 7
+                terrain[-1].damage = 3
+            if height == 0 and i == 9 or height == 0 and i == 10:
+                terrain[-1].ore = 'Bluestone'
+                terrain[-1].hardness = 50
+                terrain[-1].extra = ''
+                terrain[-1].value = 7
+                terrain[-1].damage = 3
             
             # Ore
             if height == 0:
@@ -59,10 +74,16 @@ def make_terrain(depth):
                 terrain[-1].extra = 'Coal'
                 terrain[-1].hardness += 10
                 terrain[-1].value += 2
+                terrain[-1].damage += 1
             if height > 3 and height < 50 and random.randint(1,20) == 1:
                 terrain[-1].extra = 'Iron'
                 terrain[-1].hardness += 20
                 terrain[-1].value += 5
+                terrain[-1].damage += 1
+
+            # Extra health the deeper you go
+            terrain[-1].hardness += 5*math.floor(((height-10)/10))
+            terrain[-1].health = terrain[-1].hardness
             
 
         height += 1

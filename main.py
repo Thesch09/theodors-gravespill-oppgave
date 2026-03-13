@@ -14,6 +14,7 @@ running = True
 clock = pygame.time.Clock()
 delta_time = 0.1
 debug = False
+shopOverlay = False
 # Player VARs
 x = 304
 y = -640
@@ -23,6 +24,11 @@ jumpStrength = 150
 jumpable = False
 digPower = 30
 money = 0
+maxHealth = 25
+health = maxHealth
+moneyLoss = 0.0 # Float. 0 is lose all, 1 is keep all
+deathTimer = 0
+controlls = "move"
 # Player movement VARs
 keyDPressed = False
 keyAPressed = False
@@ -43,7 +49,7 @@ if True: # Only so that I can hide it in editor
     stone = pygame.transform.scale(stone,
                                 (stone.get_width() * 2,
                                 stone.get_height() * 2))
-    dirt = pygame.image.load('img/dirtV2.png').convert_alpha()
+    dirt = pygame.image.load('img/dirtV3.png').convert_alpha()
     dirt = pygame.transform.scale(dirt,
                                 (dirt.get_width() * 2,
                                 dirt.get_height() * 2))
@@ -51,7 +57,11 @@ if True: # Only so that I can hide it in editor
     bluestone = pygame.transform.scale(bluestone,
                                 (bluestone.get_width() * 2,
                                 bluestone.get_height() * 2))
-    player = pygame.image.load('img/drillNormal.png').convert_alpha()
+    drill = pygame.image.load('img/drillNormalV2.png').convert_alpha()
+    drill = pygame.transform.scale(drill,
+                                (drill.get_width() * 2,
+                                drill.get_height() * 2))
+    player = pygame.image.load('img/drillBodyOrange.png').convert_alpha()
     player = pygame.transform.scale(player,
                                 (player.get_width() * 2,
                                 player.get_height() * 2))
@@ -87,10 +97,29 @@ if True: # Only so that I can hide it in editor
     rainbowite = pygame.transform.scale(rainbowite,
                                 (rainbowite.get_width() * 2,
                                 rainbowite.get_height() * 2))
+    heart = pygame.image.load('img/heart.png').convert_alpha()
+    heart = pygame.transform.scale(heart,
+                                (heart.get_width() * 2,
+                                heart.get_height() * 2))
+    break1 = pygame.image.load('img/break1.png').convert_alpha()
+    break1 = pygame.transform.scale(break1,
+                                (break1.get_width() * 2,
+                                break1.get_height() * 2))
+    break2 = pygame.image.load('img/break2.png').convert_alpha()
+    break2 = pygame.transform.scale(break2,
+                                (break2.get_width() * 2,
+                                break2.get_height() * 2))
+    break3 = pygame.image.load('img/break3.png').convert_alpha()
+    break3 = pygame.transform.scale(break3,
+                                (break3.get_width() * 2,
+                                break3.get_height() * 2))
 
 digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
 digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
 digSFX3 = pygame.mixer.Sound('sfx/dig3.wav')
+pygame.mixer.Sound.set_volume(digSFX1, 0.5)
+pygame.mixer.Sound.set_volume(digSFX2, 0.5)
+pygame.mixer.Sound.set_volume(digSFX3, 0.5)
 digNoises = [digSFX1, digSFX2, digSFX3]
 oreBreak = pygame.mixer.Sound('sfx/oreBreak.wav')
 rockBreak = pygame.mixer.Sound('sfx/rockBreak.wav')
@@ -113,6 +142,7 @@ def draw_terrain(screen, terrain, camera):
                 screen.blit(bluestone,(i.x,y+camera))
             if i.ore == 'Redstone':
                 screen.blit(redstone,(i.x,y+camera))
+
             # Ore type
             if i.extra == 'Grass':
                 screen.blit(grass,(i.x,y+camera))
@@ -129,15 +159,23 @@ def draw_terrain(screen, terrain, camera):
             if i.extra == 'Rainbowite':
                 screen.blit(rainbowite,(i.x,y+camera))
 
+            # Check if it's broken
+            if i.health < i.hardness/4:
+                screen.blit(break3, (i.x, y+cam_y))
+            if i.health < i.hardness/4*2:
+                screen.blit(break2, (i.x, y+cam_y))
+            if i.health < i.hardness/4*3:
+                screen.blit(break1, (i.x, y+cam_y))
+
 def collide(playerX):
-    hitbox = pygame.Rect(playerX, 224, 32, 32)
+    hitbox = pygame.Rect(playerX+4, 224, 24, 32)
     colly = 1
     for i in range(len(terrain)):
         collision = hitbox.colliderect(terrain[i].rect)
         if collision:
             return collision
 def redoGroundRects(terrain, camera):
-    hitbox = pygame.Rect(x, 226, 32, 32)
+    hitbox = pygame.Rect(x+4, 226, 24, 32)
     for i in range(len(terrain)):
         y = terrain[i].y + 600 + camera
         terrain[i].rect = pygame.Rect(0,0,32,32)
@@ -151,25 +189,37 @@ def redoGroundRects(terrain, camera):
 
     
 print(len(terrain)/20)
-hitbox = pygame.Rect(x, 224, 32, 32)
+hitbox = pygame.Rect(x+4, 224, 24, 32)
 digSquare = pygame.Rect(x, 224, 8, 8)
 while running:
-    screen.fill((0,0,0))
+    # BG
+    screen.fill((112, 224, 255)) # Default
+    if y < -742:
+        screen.fill((107, 186, 209)) # TRANSITION 1: DEFAULT -> CAVE 1
+    if y < -774:
+        screen.fill((118, 169, 184)) # TRANSITION 2: DEFAULT -> CAVE 1
+    if y < -806:
+        screen.fill((118, 139, 145)) # TRANSITION 3: DEFAULT -> CAVE 1
+    if y < -838:
+        screen.fill((122, 122, 122)) # CAVE 1
+
+
     
-    hitbox = pygame.Rect(x, 226, 32, 32)
+    hitbox = pygame.Rect(x+4, 226, 24, 32)
     redoGroundRects(terrain, cam_y)
-    
+
+    draw_terrain(screen, terrain, cam_y)
     for i in range(len(terrain)): # Breaking of Blocks
         collision = digSquare.colliderect(terrain[i].rect)
         if collision and keyAnyPressed:
-            terrain[i].hardness -= digPower * delta_time
-            print("OI", terrain[i].hardness)
+            terrain[i].health -= digPower * delta_time
             if random.randint(1,20) == 1:
                 digNoises[random.randint(0,2)].play()
                 print("sound")
-            if terrain[i].hardness <= 0:
+            if terrain[i].health <= 0:
                 terrain[i].mined = True
                 money += terrain[i].value
+                health -= terrain[i].damage
                 if terrain[i].extra != '' and terrain[i].extra != 'Grass':
                     oreBreak.play()
                 elif random.randint(1,3) == 1:
@@ -178,8 +228,6 @@ while running:
     speedY += gravity
     if speedY > jumpStrength:
         speedY = jumpStrength
-
-    draw_terrain(screen, terrain, cam_y)
 
     y -= speedY * delta_time
     collision = collide(x)
@@ -206,6 +254,7 @@ while running:
         y -= 1
 
     screen.blit(player, (x, 223))
+    screen.blit(drill, (x, 223))
 
     cam_y = y
 
@@ -213,8 +262,9 @@ while running:
     velY = font.render(f"Vertical Velocity: {speedY}", True, (255,255,255))
     playerY = font.render(f"Y: {y}", True, (255,255,255))
     moneyText = font.render(f"${money}", True, (255,255,0))
+    healthText = font.render(f"{health}/{maxHealth}", True, (255,0,0))
 
-    hitbox = pygame.Rect(x, 224, 32, 32)
+    hitbox = pygame.Rect(x+4, 224, 24, 32)
     if debug:
         for i in range(len(terrain)):
             pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
@@ -223,8 +273,6 @@ while running:
         screen.blit(playerX, (4,64))
         screen.blit(playerY, (4,94))
         screen.blit(velY, (4,124))
-        
-    screen.blit(moneyText, (4,34))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -256,6 +304,13 @@ while running:
                 y = -640
                 cam_y = y
                 x = 304
+            if event.key == pygame.K_ESCAPE:
+                if shopOverlay:
+                    shopOverlay = False
+                    controlls = "move"
+                else:
+                    shopOverlay = True
+                    controlls = "shop"
 
         #Checking for when a button is released
         if event.type == pygame.KEYUP:
@@ -273,46 +328,53 @@ while running:
                 keySPressed = False
         
     
-    keyAnyPressed = False
-    if keyDPressed:
-        x += moveSpeed * delta_time
-        collision = collide(x)
-        digSquare = pygame.Rect(x+24, 224+8, 16, 16)
-        while collision:
-            x -= 1
+    if controlls == "move":
+        if keyDPressed:
+            x += moveSpeed * delta_time
             collision = collide(x)
-        keyAnyPressed = True
-        player = pygame.transform.rotate(player, degrees*-1)
-        degrees = -90
-        player = pygame.transform.rotate(player, degrees)
+            digSquare = pygame.Rect(x+24, 224+8, 16, 16)
+            while collision:
+                x -= 1
+                collision = collide(x)
+            keyAnyPressed = True
+            player = pygame.transform.rotate(player, degrees*-1)
+            drill = pygame.transform.rotate(drill, degrees*-1)
+            degrees = -90
+            player = pygame.transform.rotate(player, degrees)
+            drill = pygame.transform.rotate(drill, degrees)
 
-    if keyAPressed:
-        x -= moveSpeed * delta_time
-        collision = collide(x)
-        digSquare = pygame.Rect(x-8, 224+8, 16, 16)
-        while collision:
-            x += 1
+        if keyAPressed:
+            x -= moveSpeed * delta_time
             collision = collide(x)
-        keyAnyPressed = True
-        player = pygame.transform.rotate(player, degrees*-1)
-        degrees = 90
-        player = pygame.transform.rotate(player, degrees)
+            digSquare = pygame.Rect(x-8, 224+8, 16, 16)
+            while collision:
+                x += 1
+                collision = collide(x)
+            keyAnyPressed = True
+            player = pygame.transform.rotate(player, degrees*-1)
+            drill = pygame.transform.rotate(drill, degrees*-1)
+            degrees = 90
+            player = pygame.transform.rotate(player, degrees)
+            drill = pygame.transform.rotate(drill, degrees)
 
-    if keyWPressed:
-        digSquare = pygame.Rect(x+8, 224-8, 16, 16)
-        if jumpable:
-            speedY -= jumpStrength
-        keyAnyPressed = True
-        player = pygame.transform.rotate(player, degrees*-1)
-        degrees = 0
-        player = pygame.transform.rotate(player, degrees)
-    if keySPressed:
-        digSquare = pygame.Rect(x+8, 224+24, 16, 16)
-        keyAnyPressed = True
-        player = pygame.transform.rotate(player, degrees*-1)
-        degrees = 180
-        player = pygame.transform.rotate(player, degrees)
-
+        if keyWPressed:
+            digSquare = pygame.Rect(x+8, 224-8, 16, 16)
+            if jumpable:
+                speedY -= jumpStrength
+            keyAnyPressed = True
+            player = pygame.transform.rotate(player, degrees*-1)
+            drill = pygame.transform.rotate(drill, degrees*-1)
+            degrees = 0
+            player = pygame.transform.rotate(player, degrees)
+            drill = pygame.transform.rotate(drill, degrees)
+        if keySPressed:
+            digSquare = pygame.Rect(x+8, 224+24, 16, 16)
+            keyAnyPressed = True
+            player = pygame.transform.rotate(player, degrees*-1)
+            drill = pygame.transform.rotate(drill, degrees*-1)
+            degrees = 180
+            player = pygame.transform.rotate(player, degrees)
+            drill = pygame.transform.rotate(drill, degrees)
 
     if x < 0:
         x = 0
@@ -321,7 +383,32 @@ while running:
     if y < (world_depth+10)*64*-1:
         y = -200
         print("loop")
+    if health < 1:
+        print(deathTimer)
+        keyAnyPressed = False
+        controlls = "dead"
+        money = math.floor(money * moneyLoss)
+        if deathTimer == 0:
+            deathTimer = 3
+        else:
+            deathTimer -= 1*delta_time
+            if deathTimer <= 0:
+                deathTimer = 0
+                health = maxHealth
+                controlls = "move"
+                x = 304
+                y = -640
 
+    shopTemp = pygame.Rect(32, 32, 576, 416)
+    shopTempOutline = pygame.Rect(30, 30, 580, 420)
+    if shopOverlay:
+        pygame.draw.rect(screen, (50, 50, 50), shopTempOutline)
+        pygame.draw.rect(screen, (122, 122, 122), shopTemp)
+        screen.blit(moneyText, (36, 36))
+    else:
+        screen.blit(moneyText, (4,34))
+    screen.blit(heart, (4,4))
+    screen.blit(healthText, (36, 10))
 
     # end stuff
     pygame.display.flip()
