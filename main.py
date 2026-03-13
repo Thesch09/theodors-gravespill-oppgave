@@ -209,9 +209,10 @@ while running:
 
     cam_y = y
 
-    playerX = font.render(f"{x}", True, (255,255,255))
-    velY = font.render(f"{speedY}", True, (255,255,255))
-    velY = font.render(f"${money}", True, (255,255,0))
+    playerX = font.render(f"X: {x}", True, (255,255,255))
+    velY = font.render(f"Vertical Velocity: {speedY}", True, (255,255,255))
+    playerY = font.render(f"Y: {y}", True, (255,255,255))
+    moneyText = font.render(f"${money}", True, (255,255,0))
 
     hitbox = pygame.Rect(x, 224, 32, 32)
     if debug:
@@ -219,9 +220,11 @@ while running:
             pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
         pygame.draw.rect(screen, (255, 0, 0), hitbox)
         pygame.draw.rect(screen, (0, 0, 255), digSquare)
-        screen.blit(playerX, (34,4))
-        screen.blit(velY, (4,64))
-    screen.blit(velY, (4,4))
+        screen.blit(playerX, (4,64))
+        screen.blit(playerY, (4,94))
+        screen.blit(velY, (4,124))
+        
+    screen.blit(moneyText, (4,34))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -315,6 +318,10 @@ while running:
         x = 0
     if x > 608:
         x = 608
+    if y < (world_depth+10)*64*-1:
+        y = -200
+        print("loop")
+
 
     # end stuff
     pygame.display.flip()
