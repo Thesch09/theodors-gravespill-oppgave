@@ -38,7 +38,8 @@ keyAnyPressed = False
 keySpacePressed = False
 degrees = 0
 shopCursorSlot = 0
-shopTab = "upgrades"
+shopTab = ["upgrades", "unique", "drill", "hull"]
+shopTabId = 0
 moveShop = 0
 # Player upgrade costs
 heartCost = 100
@@ -126,6 +127,10 @@ if True: # Only so that I can hide it in editor
     heart = pygame.transform.scale(heart,
                                 (heart.get_width() * 2,
                                 heart.get_height() * 2))
+    heartUnique = pygame.image.load('img/heartUnique.png').convert_alpha()
+    heartUnique = pygame.transform.scale(heartUnique,
+                                (heartUnique.get_width() * 2,
+                                heartUnique.get_height() * 2))
     digPowerGUI = pygame.image.load('img/digPower.png').convert_alpha()
     digPowerGUI = pygame.transform.scale(digPowerGUI,
                                 (digPowerGUI.get_width() * 2,
@@ -134,10 +139,31 @@ if True: # Only so that I can hide it in editor
     digPowerUnique = pygame.transform.scale(digPowerUnique,
                                 (digPowerUnique.get_width() * 2,
                                 digPowerUnique.get_height() * 2))
-    heartUnique = pygame.image.load('img/heartUnique.png').convert_alpha()
-    heartUnique = pygame.transform.scale(heartUnique,
-                                (heartUnique.get_width() * 2,
-                                heartUnique.get_height() * 2))
+    jumpStrengthGUI = pygame.image.load('img/jumpStrength.png').convert_alpha()
+    jumpStrengthGUI = pygame.transform.scale(jumpStrengthGUI,
+                                (jumpStrengthGUI.get_width() * 2,
+                                jumpStrengthGUI.get_height() * 2))
+    jumpStrengthUnique = pygame.image.load('img/jumpStrengthUnique.png').convert_alpha()
+    jumpStrengthUnique = pygame.transform.scale(jumpStrengthUnique,
+                                (jumpStrengthUnique.get_width() * 2,
+                                jumpStrengthUnique.get_height() * 2))
+    moneyBag = pygame.image.load('img/moneyBag.png').convert_alpha()
+    moneyBag = pygame.transform.scale(moneyBag,
+                                (moneyBag.get_width() * 2,
+                                moneyBag.get_height() * 2))
+    moneyBagUnique = pygame.image.load('img/moneyBagUnique.png').convert_alpha()
+    moneyBagUnique = pygame.transform.scale(moneyBagUnique,
+                                (moneyBagUnique.get_width() * 2,
+                                moneyBagUnique.get_height() * 2))
+    moveSpeedGUI = pygame.image.load('img/moveSpeed.png').convert_alpha()
+    moveSpeedGUI = pygame.transform.scale(moveSpeedGUI,
+                                (moveSpeedGUI.get_width() * 2,
+                                moveSpeedGUI.get_height() * 2))
+    moveSpeedUnique = pygame.image.load('img/moveSpeedUnique.png').convert_alpha()
+    moveSpeedUnique = pygame.transform.scale(moveSpeedUnique,
+                                (moveSpeedUnique.get_width() * 2,
+                                moveSpeedUnique.get_height() * 2))
+    
     shopBuy = pygame.image.load('img/shopBuy.png').convert_alpha()
     shopBuy = pygame.transform.scale(shopBuy,
                                 (shopBuy.get_width() * 2,
@@ -153,7 +179,23 @@ if True: # Only so that I can hide it in editor
     shopButtonSelect = pygame.image.load('img/shopButtonSelect.png').convert_alpha()
     shopButtonSelect = pygame.transform.scale(shopButtonSelect,
                                 (shopButtonSelect.get_width() * 2,
-                                shopButtonSelect.get_height() * 2))    
+                                shopButtonSelect.get_height() * 2))
+    drillSkins = pygame.image.load('img/drillSkins.png').convert_alpha()
+    drillSkins = pygame.transform.scale(drillSkins,
+                                (drillSkins.get_width() * 2,
+                                drillSkins.get_height() * 2))
+    hullSkins = pygame.image.load('img/hullSkins.png').convert_alpha()
+    hullSkins = pygame.transform.scale(hullSkins,
+                                (hullSkins.get_width() * 2,
+                                hullSkins.get_height() * 2))
+    upgrades = pygame.image.load('img/upgrades.png').convert_alpha()
+    upgrades = pygame.transform.scale(upgrades,
+                                (upgrades.get_width() * 2,
+                                upgrades.get_height() * 2))
+    upgradesUnique = pygame.image.load('img/upgradesUnique.png').convert_alpha()
+    upgradesUnique = pygame.transform.scale(upgradesUnique,
+                                (upgradesUnique.get_width() * 2,
+                                upgradesUnique.get_height() * 2))
 
 digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
 digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
@@ -237,9 +279,12 @@ class shopItem:
         self.priceIncrease = priceIncrease
 
 heartShop = shopItem(100, "Increases maximum HP by 5.", heart, "upgrades", 0, 10)
-digPowerShop = shopItem(25, "Increases Dig Power by 5.", digPowerGUI, "upgrades", 1, 3)
+digPowerShop = shopItem(25, "Increases dig power by 5.", digPowerGUI, "upgrades", 1, 3)
+jumpStrengthShop = shopItem(75, "Increases jump strength by 5.", jumpStrengthGUI, "upgrades", 2, 2.5)
+moveSpeedShop = shopItem(50, "Increases horisontal sped by 5.", moveSpeedGUI, "upgrades", 3, 3)
+moneyBagShop = shopItem(500, "Saves 1% of money on death.", moneyBag, "upgrades", 4, 2.5)
 
-shop = [heartShop, digPowerShop]
+shop = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop]
 
 
 print(len(terrain)/20)
@@ -370,6 +415,8 @@ while running:
                 else:
                     shopOverlay = True
                     controlls = "shop"
+                    shopCursorSlot = 0
+                    shopTabId = 0
 
         #Checking for when a button is released
         if event.type == pygame.KEYUP:
@@ -449,26 +496,31 @@ while running:
             drill = pygame.transform.rotate(drill, degrees)
 
     if controlls == "shop": # For when in the shop GUI
+
+        if shopTab[shopTabId] == "drill":
+            screen.blit(drillSkins, (240,32))
+        if shopTab[shopTabId] == "upgrades":
+            screen.blit(upgrades, (240,32))
+        if shopTab[shopTabId] == "hull":
+            screen.blit(hullSkins, (240,32))
+        if shopTab[shopTabId] == "unique":
+            screen.blit(upgradesUnique, (240,32))
+
         for i in shop:
             shopText = font.render(f"{i.flavour} Cost: {i.cost}", True, (255,255,255))
-            if i.tab == shopTab:
+            if i.tab == shopTab[shopTabId]:
                 screen.blit(i.sprite, (32, 64+36*i.slot))
                 screen.blit(shopText, (64, 72+36*i.slot))
                 if money >= i.cost:
                     screen.blit(shopBuy, (540, 64+36*i.slot))
                 else:
                     screen.blit(shopPoor, (540, 64+36*i.slot))
-        '''
-        if shopTab == "upgrades":
-            screen.blit(heart, (32,64))
-            screen.blit(heartFlavour, (64,72))
-            if money >= heartCost:
-                screen.blit(shopBuy, (540, 64))
-            else:
-                screen.blit(shopPoor, (540, 64))
-        '''
+
         screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
         if keySpacePressed:
+            for i in shop:
+                if i.tab == shopTab[shopTabId] and i.slot == shopCursorSlot:
+                    print("SASS")
             print("SHOP")
         if moveShop == 1:
             if keySPressed:
@@ -479,6 +531,16 @@ while running:
                 shopCursorSlot = 4
             if shopCursorSlot > 4:
                 shopCursorSlot = 0
+            if keyDPressed:
+                shopTabId += 1
+                shopCursorSlot = 0
+            if keyAPressed:
+                shopTabId += 1
+                shopCursorSlot = 0
+            if shopTabId < 0:
+                shopTabId = 3
+            if shopTabId > 3:
+                shopTabId = 0
 
     if x < 0:
         x = 0
@@ -504,7 +566,7 @@ while running:
                 y = -640
     
     moveShop += 1
-    if moveShop > 3:
+    if moveShop > 7:
         moveShop = 0
 
     # end stuff
