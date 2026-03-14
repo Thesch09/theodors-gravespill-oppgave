@@ -32,38 +32,54 @@ def make_terrain(depth):
             if height == 2 and random.randint(1,2) == 2:
                 terrain[-1].ore = 'Stone'
                 terrain[-1].hardness = 25
-                terrain[-1].extra = ''
                 terrain[-1].value = 2
                 terrain[-1].damage = 1
             if height >= 3:
                 terrain[-1].ore = 'Stone'
                 terrain[-1].hardness = 25
-                terrain[-1].extra = ''
                 terrain[-1].value = 2
                 terrain[-1].damage = 1
-            if height > 25:
+            if height > 73:
                 if random.randint(1,2) == 2:
                     terrain[-1].ore = 'Bluestone'
                     terrain[-1].hardness = 50
-                    terrain[-1].extra = ''
                     terrain[-1].value = 7
                     terrain[-1].damage = 3
                 else:
                     terrain[-1].ore = 'Stone'
                     terrain[-1].hardness = 25
-                    terrain[-1].extra = ''
                     terrain[-1].value = 2
                     terrain[-1].damage = 3
-            if height > 27:
+            if height > 75:
                 terrain[-1].ore = 'Bluestone'
                 terrain[-1].hardness = 50
-                terrain[-1].extra = ''
                 terrain[-1].value = 7
                 terrain[-1].damage = 3
+            if height > 148:
+                if random.randint(1,2) == 1:
+                    terrain[-1].ore = 'Redstone'
+                    terrain[-1].hardness = 200
+                    terrain[-1].value = 50
+                    terrain[-1].damage = 7
+                else:
+                    terrain[-1].ore = 'Bluestone'
+                    terrain[-1].hardness = 50
+                    terrain[-1].value = 7
+                    terrain[-1].damage = 3
+            if height > 150:
+                terrain[-1].ore = 'Redstone'
+                terrain[-1].hardness = 200
+                terrain[-1].value = 50
+                terrain[-1].damage = 7
+            if height > 174 and random.randint(1, 50) == 1:
+                terrain[-1].ore = 'Magma'
+                terrain[-1].hardness = 70
+                terrain[-1].value = 50
+                terrain[-1].damage = 50
+
             if height == 0 and i == 9 or height == 0 and i == 10:
                 terrain[-1].ore = 'Bluestone'
                 terrain[-1].hardness = 50
-                terrain[-1].extra = ''
                 terrain[-1].value = 7
                 terrain[-1].damage = 3
             
@@ -71,12 +87,12 @@ def make_terrain(depth):
             if height == 0:
                 terrain[-1].extra = 'Grass'
                 terrain[-1].hardness += 5
-            if height > 3 and height < 50 and random.randint(1,15) == 1:
+            if height > 3 and height < 50 and random.randint(1,15) == 1 and terrain[-1].extra == '':
                 terrain[-1].extra = 'Coal'
                 terrain[-1].hardness += 10
                 terrain[-1].value += 2
                 terrain[-1].damage += 1
-            if height > 15 and height < 50 and random.randint(1,20) == 1:
+            if height > 15 and height < 50 and random.randint(1,20) == 1 and terrain[-1].extra == '':
                 terrain[-1].extra = 'Iron'
                 terrain[-1].hardness += 20
                 terrain[-1].value += 7

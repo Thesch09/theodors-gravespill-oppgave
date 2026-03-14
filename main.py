@@ -12,7 +12,9 @@ screen = pygame.display.set_mode((640, 480), flags)
 running = True
 clock = pygame.time.Clock()
 delta_time = 0.1
-debug = False
+debugQOL = False
+debugHitbox = False
+debugMovement = False
 shopOverlay = False
 # Player VARs
 x = 304
@@ -48,7 +50,7 @@ moveShop = 0
 cam_y = y
 collision = False
 gravity = 5
-world_depth = 30
+world_depth = 450
 font = pygame.font.Font(None, size=30)
 
 if True: # So that I can hide it in editor
@@ -95,6 +97,26 @@ if True: # So that I can hide it in editor
     redstone = pygame.transform.scale(redstone,
                                 (redstone.get_width() * 2,
                                 redstone.get_height() * 2))
+    spaceStone = pygame.image.load('img/spaceStone.png').convert_alpha()
+    spaceStone = pygame.transform.scale(spaceStone,
+                                (spaceStone.get_width() * 2,
+                                spaceStone.get_height() * 2))
+    space = pygame.image.load('img/space.png').convert_alpha()
+    space = pygame.transform.scale(space,
+                                (space.get_width() * 2,
+                                space.get_height() * 2))
+    bloodstone = pygame.image.load('img/bloodstone.png').convert_alpha()
+    bloodstone = pygame.transform.scale(bloodstone,
+                                (bloodstone.get_width() * 2,
+                                bloodstone.get_height() * 2))
+    abyssmarine = pygame.image.load('img/abyssmarine.png').convert_alpha()
+    abyssmarine = pygame.transform.scale(abyssmarine,
+                                (abyssmarine.get_width() * 2,
+                                abyssmarine.get_height() * 2))
+    magma = pygame.image.load('img/magma.png').convert_alpha()
+    magma = pygame.transform.scale(magma,
+                                (magma.get_width() * 2,
+                                magma.get_height() * 2))
     
     # Ores
     iron = pygame.image.load('img/iron.png').convert_alpha()
@@ -133,6 +155,22 @@ if True: # So that I can hide it in editor
     uniqueOre3 = pygame.transform.scale(uniqueOre3,
                                 (uniqueOre3.get_width() * 2,
                                 uniqueOre3.get_height() * 2))
+    star = pygame.image.load('img/star.png').convert_alpha()
+    star = pygame.transform.scale(star,
+                                (star.get_width() * 2,
+                                star.get_height() * 2))
+    bigStar = pygame.image.load('img/starBig.png').convert_alpha()
+    bigStar = pygame.transform.scale(bigStar,
+                                (bigStar.get_width() * 2,
+                                bigStar.get_height() * 2))
+    gold = pygame.image.load('img/gold.png').convert_alpha()
+    gold = pygame.transform.scale(gold,
+                                (gold.get_width() * 2,
+                                gold.get_height() * 2))
+    lapisLazuli = pygame.image.load('img/lapisLazuli.png').convert_alpha()
+    lapisLazuli = pygame.transform.scale(lapisLazuli,
+                                (lapisLazuli.get_width() * 2,
+                                lapisLazuli.get_height() * 2))
     
     # GUI
     heart = pygame.image.load('img/heart.png').convert_alpha()
@@ -246,6 +284,16 @@ def draw_terrain(screen, terrain, camera):
                 screen.blit(bluestone, (i.x, y+camera))
             if i.ore == 'Redstone':
                 screen.blit(redstone, (i.x, y+camera))
+            if i.ore == 'Magma':
+                screen.blit(magma, (i.x, y+camera))
+            if i.ore == 'Space':
+                screen.blit(space, (i.x, y+camera))
+            if i.ore == 'Space Stone':
+                screen.blit(spaceStone, (i.x, y+camera))
+            if i.ore == 'Abyssmarine':
+                screen.blit(abyssmarine, (i.x, y+camera))
+            if i.ore == 'Bloodstone':
+                screen.blit(bloodstone, (i.x, y+camera))
 
             # Ore type
             if i.extra == 'Grass':
@@ -355,30 +403,17 @@ while running:
                 print("sound")
             if terrain[i].health <= 0:
                 terrain[i].mined = True
-                if not debug:
-                    health -= terrain[i].damage
+                health -= terrain[i].damage
                 
                 moneyRepeat = 1
                 if playerHasUniquePickaxe > 0:
                     moneyRepeat += math.floor(playerHasUniquePickaxe)
-                    for i in range(moneyRepeat):
-                        if terrain[i].extra != '' and terrain[i].extra != 'Grass':
-                            oreBreak.play()
-                        elif random.randint(1,3) == 1:
-                            rockBreak.play()
-                        money += terrain[i].value
-                        uniqueOres += terrain[i].uniqueOre
-                else:
-                    if terrain[i].extra != '' and terrain[i].extra != 'Grass':
-                        oreBreak.play()
-                    elif random.randint(1,3) == 1:
-                        rockBreak.play()
-                    money += terrain[i].value
-                    uniqueOres += terrain[i].uniqueOre
-                if playerHasUniqueHeart and random.randint(1,2) == 1:
-                    health += 1
-                    if health > maxHealth:
-                        health = maxHealth
+                if terrain[i].extra != '' and terrain[i].extra != 'Grass':
+                    oreBreak.play()
+                elif random.randint(1,3) == 1:
+                    rockBreak.play()
+                money += terrain[i].value * moneyRepeat
+                uniqueOres += terrain[i].uniqueOre * moneyRepeat
 
     speedY += gravity
     if speedY > jumpStrength:
@@ -421,14 +456,18 @@ while running:
     healthText = font.render(f"{health}/{maxHealth}", True, (255,0,0))
 
     hitbox = pygame.Rect(x+4, 224, 24, 32)
-    if debug:
+    if debugHitbox:
         for i in range(len(terrain)):
             pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
         pygame.draw.rect(screen, (255, 0, 0), hitbox)
         pygame.draw.rect(screen, (0, 0, 255), digSquare)
+    if debugMovement:
         screen.blit(playerX, (4,94))
         screen.blit(playerY, (4,124))
         screen.blit(velY, (4,154))
+    if debugQOL:
+        health = maxHealth
+        jumpable = True
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -448,12 +487,28 @@ while running:
             if event.key == pygame.K_s:
                 print("S down")
                 keySPressed = True
-            if event.key == pygame.K_F3:
-                if debug:
-                    debug = False
+            if event.key == pygame.K_F1:
+                if debugQOL:
+                    debugQOL = False
+                    digPower -= 9000
                     print("DEBUG OFF")
                 else:
-                    debug = True
+                    debugQOL = True
+                    digPower += 9000
+                    print("DEBUG ON")
+            if event.key == pygame.K_F2:
+                if debugHitbox:
+                    debugHitbox = False
+                    print("DEBUG OFF")
+                else:
+                    debugHitbox = True
+                    print("DEBUG ON")
+            if event.key == pygame.K_F3:
+                if debugMovement:
+                    debugMovement = False
+                    print("DEBUG OFF")
+                else:
+                    debugMovement = True
                     print("DEBUG ON")
             if event.key == pygame.K_SPACE and controlls == "move":
                 speedY = 0
@@ -693,7 +748,9 @@ while running:
         x = 0
     if x > 608:
         x = 608
-    if y < (world_depth+10)*64*-1:
+    #print((world_depth+10)*32)
+    #print(terrain[len(terrain)-1].y+20*32*-1)
+    if y < (world_depth+30)*32*-1:
         y = -200
         print("loop")
     if health < 1:
