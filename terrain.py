@@ -18,6 +18,7 @@ def make_terrain(depth):
                 value = 1
                 damage = 0
                 health = hardness
+                uniqueOre = 0
             terrain.append(block)
             terrain[-1].x = i*32
             terrain[-1].y = 350+height*32
@@ -80,6 +81,14 @@ def make_terrain(depth):
                 terrain[-1].hardness += 20
                 terrain[-1].value += 7
                 terrain[-1].damage += 1
+            
+            # Unique ore
+            if terrain[-1].extra == '' and terrain[-1].ore != 'Dirt' and random.randint(1,100) == 1:
+                terrain[-1].extra = 'Unique Ore'
+                terrain[-1].hardness += 100
+                terrain[-1].uniqueOre = 1
+                terrain[-1].damage += 5
+                terrain[-1].value += 15
 
             # Extra health the deeper you go
             terrain[-1].hardness += 5*math.floor(((height-10)/10))

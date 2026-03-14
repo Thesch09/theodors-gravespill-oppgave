@@ -4,7 +4,6 @@ import random
 import time
 from terrain import make_terrain
 
-
 pygame.init()
 
 # Set up
@@ -24,11 +23,13 @@ jumpStrength = 150
 jumpable = False
 digPower = 30
 money = 0
+uniqueOres = 0
 maxHealth = 25
 health = maxHealth
 moneyLoss = 0.0 # Float. 0 is lose all, 1 is keep all
 deathTimer = 0
 controlls = "move"
+playerHasUniqueMoneyBag = False
 # Player movement VARs
 keyDPressed = False
 keyAPressed = False
@@ -41,8 +42,6 @@ shopCursorSlot = 0
 shopTab = ["upgrades", "unique", "drill", "hull"]
 shopTabId = 0
 moveShop = 0
-# Player upgrade costs
-heartCost = 100
 # End of player VARs
 cam_y = y
 collision = False
@@ -50,8 +49,7 @@ gravity = 5
 world_depth = 30
 font = pygame.font.Font(None, size=30)
 
-# Creation of stones
-if True: # Only so that I can hide it in editor
+if True: # So that I can hide it in editor
     # PLAYER VISUALS
     drill = pygame.image.load('img/drillNormalV2.png').convert_alpha()
     drill = pygame.transform.scale(drill,
@@ -121,6 +119,18 @@ if True: # Only so that I can hide it in editor
     rainbowite = pygame.transform.scale(rainbowite,
                                 (rainbowite.get_width() * 2,
                                 rainbowite.get_height() * 2))
+    uniqueOre = pygame.image.load('img/uniqueOre.png').convert_alpha()
+    uniqueOre = pygame.transform.scale(uniqueOre,
+                                (uniqueOre.get_width() * 2,
+                                uniqueOre.get_height() * 2))
+    uniqueOre2 = pygame.image.load('img/uniqueOre2.png').convert_alpha()
+    uniqueOre2 = pygame.transform.scale(uniqueOre2,
+                                (uniqueOre2.get_width() * 2,
+                                uniqueOre2.get_height() * 2))
+    uniqueOre3 = pygame.image.load('img/uniqueOre3.png').convert_alpha()
+    uniqueOre3 = pygame.transform.scale(uniqueOre3,
+                                (uniqueOre3.get_width() * 2,
+                                uniqueOre3.get_height() * 2))
     
     # GUI
     heart = pygame.image.load('img/heart.png').convert_alpha()
@@ -164,6 +174,7 @@ if True: # Only so that I can hide it in editor
                                 (moveSpeedUnique.get_width() * 2,
                                 moveSpeedUnique.get_height() * 2))
     
+    # Shop buttons and titles
     shopBuy = pygame.image.load('img/shopBuy.png').convert_alpha()
     shopBuy = pygame.transform.scale(shopBuy,
                                 (shopBuy.get_width() * 2,
@@ -196,6 +207,10 @@ if True: # Only so that I can hide it in editor
     upgradesUnique = pygame.transform.scale(upgradesUnique,
                                 (upgradesUnique.get_width() * 2,
                                 upgradesUnique.get_height() * 2))
+    stats = pygame.image.load('img/stats.png').convert_alpha()
+    stats = pygame.transform.scale(stats,
+                                (stats.get_width() * 2,
+                                stats.get_height() * 2))
 
 digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
 digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
@@ -218,29 +233,35 @@ def draw_terrain(screen, terrain, camera):
             y = i.y + 600
             # Rock type
             if i.ore == 'Stone':
-                screen.blit(stone,(i.x,y+camera))
+                screen.blit(stone, (i.x, y+camera))
             if i.ore == 'Dirt':
-                screen.blit(dirt,(i.x,y+camera))
+                screen.blit(dirt, (i.x, y+camera))
             if i.ore == 'Bluestone':
-                screen.blit(bluestone,(i.x,y+camera))
+                screen.blit(bluestone, (i.x, y+camera))
             if i.ore == 'Redstone':
-                screen.blit(redstone,(i.x,y+camera))
+                screen.blit(redstone, (i.x, y+camera))
 
             # Ore type
             if i.extra == 'Grass':
-                screen.blit(grass,(i.x,y+camera))
+                screen.blit(grass, (i.x, y+camera))
             if i.extra == 'Iron':
-                screen.blit(iron,(i.x,y+camera))
+                screen.blit(iron, (i.x, y+camera))
             if i.extra == 'Copper':
-                screen.blit(copper,(i.x,y+camera))
+                screen.blit(copper, (i.x, y+camera))
             if i.extra == 'Coal':
-                screen.blit(coal,(i.x,y+camera))
+                screen.blit(coal, (i.x, y+camera))
             if i.extra == 'Diamond':
-                screen.blit(diamond,(i.x,y+camera))
+                screen.blit(diamond, (i.x, y+camera))
             if i.extra == 'Bismuth':
-                screen.blit(bismuth,(i.x,y+camera))
+                screen.blit(bismuth, (i.x, y+camera))
             if i.extra == 'Rainbowite':
-                screen.blit(rainbowite,(i.x,y+camera))
+                screen.blit(rainbowite, (i.x, y+camera))
+            if i.extra == 'Unique Ore':
+                screen.blit(uniqueOre, (i.x, y+camera))
+            if i.extra == 'Big Unique Ore':
+                screen.blit(uniqueOre2, (i.x, y+camera))
+            if i.extra == 'Large Unique Ore':
+                screen.blit(uniqueOre3, (i.x, y+camera))
 
             # Check if it's broken
             if i.health < i.hardness/4:
@@ -292,15 +313,18 @@ hitbox = pygame.Rect(x+4, 224, 24, 32)
 digSquare = pygame.Rect(x, 224, 8, 8)
 while running:
     # BG
-    screen.fill((112, 224, 255)) # Default
-    if y < -742:
-        screen.fill((107, 186, 209)) # TRANSITION 1: DEFAULT -> CAVE 1
-    if y < -774:
-        screen.fill((118, 169, 184)) # TRANSITION 2: DEFAULT -> CAVE 1
-    if y < -806:
-        screen.fill((118, 139, 145)) # TRANSITION 3: DEFAULT -> CAVE 1
-    if y < -838:
-        screen.fill((122, 122, 122)) # CAVE 1
+    if health < 1:
+        screen.fill((122, 0, 0))
+    else:
+        screen.fill((112, 224, 255)) # Default
+        if y < -742:
+            screen.fill((107, 186, 209)) # TRANSITION 1: DEFAULT -> CAVE 1
+        if y < -774:
+            screen.fill((118, 169, 184)) # TRANSITION 2: DEFAULT -> CAVE 1
+        if y < -806:
+            screen.fill((118, 139, 145)) # TRANSITION 3: DEFAULT -> CAVE 1
+        if y < -838:
+            screen.fill((122, 122, 122)) # CAVE 1
 
 
     
@@ -317,6 +341,7 @@ while running:
                 print("sound")
             if terrain[i].health <= 0:
                 terrain[i].mined = True
+                uniqueOres += terrain[i].uniqueOre
                 money += terrain[i].value
                 if not debug:
                     health -= terrain[i].damage
@@ -362,8 +387,8 @@ while running:
     velY = font.render(f"Vertical Velocity: {speedY}", True, (255,255,255))
     playerY = font.render(f"Y: {y}", True, (255,255,255))
     moneyText = font.render(f"${money}", True, (255,255,0))
+    uniqueOreText = font.render(f"UO:{uniqueOres}", True, (122,0,122))
     healthText = font.render(f"{health}/{maxHealth}", True, (255,0,0))
-    heartFlavour = font.render(f"Increases maximum HP by 5. Cost: {heartCost}", True, (255,255,255))
 
     hitbox = pygame.Rect(x+4, 224, 24, 32)
     if debug:
@@ -371,9 +396,9 @@ while running:
             pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
         pygame.draw.rect(screen, (255, 0, 0), hitbox)
         pygame.draw.rect(screen, (0, 0, 255), digSquare)
-        screen.blit(playerX, (4,64))
-        screen.blit(playerY, (4,94))
-        screen.blit(velY, (4,124))
+        screen.blit(playerX, (4,94))
+        screen.blit(playerY, (4,124))
+        screen.blit(velY, (4,154))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -405,6 +430,7 @@ while running:
                 y = -640
                 cam_y = y
                 x = 304
+                health = maxHealth
             if event.key == pygame.K_SPACE and controlls == "shop":
                 keySpacePressed = True
             if event.key == pygame.K_ESCAPE:
@@ -440,9 +466,13 @@ while running:
     if shopOverlay:
         pygame.draw.rect(screen, (50, 50, 50), shopTempOutline)
         pygame.draw.rect(screen, (122, 122, 122), shopTemp)
-        screen.blit(moneyText, (36, 36))
+        if shopTab[shopTabId] == "upgrades":
+            screen.blit(moneyText, (36, 36))
+        else:
+            screen.blit(uniqueOreText, (36, 36))
     else:
         screen.blit(moneyText, (4,34))
+        screen.blit(uniqueOreText, (4,64))
     screen.blit(heart, (4,4))
     screen.blit(healthText, (36, 10))
 
@@ -513,15 +543,31 @@ while running:
                 screen.blit(shopText, (64, 72+36*i.slot))
                 if money >= i.cost:
                     screen.blit(shopBuy, (540, 64+36*i.slot))
+                    shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
+                    shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
+                    pygame.draw.rect(screen, (255,0,255), shopCursorHitbox)
+                    pygame.draw.rect(screen, (0,255,255), shopButtonHitbox)
+                    shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
+                    if shopCollision and keySpacePressed and moveShop == 1:
+                        money -= i.cost
+                        i.cost = math.floor(i.cost*i.priceIncrease)
+                        if i.sprite == heart:
+                            maxHealth += 5
+                            health = maxHealth
+                        if i.sprite == digPowerGUI:
+                            digPower += 5
+                        if i.sprite == jumpStrengthGUI:
+                            jumpStrength += 5
+                        if i.sprite == moveSpeedGUI:
+                            moveSpeed += 5
+                        if i.sprite == moneyBag:
+                            moneyLoss += 0.01
+                        print("oi")
                 else:
                     screen.blit(shopPoor, (540, 64+36*i.slot))
+                
 
         screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
-        if keySpacePressed:
-            for i in shop:
-                if i.tab == shopTab[shopTabId] and i.slot == shopCursorSlot:
-                    print("SASS")
-            print("SHOP")
         if moveShop == 1:
             if keySPressed:
                 shopCursorSlot += 1
@@ -553,12 +599,15 @@ while running:
         print(deathTimer)
         keyAnyPressed = False
         controlls = "dead"
-        money = math.floor(money * moneyLoss)
         if deathTimer == 0:
             deathTimer = 3
         else:
             deathTimer -= 1*delta_time
             if deathTimer <= 0:
+                if playerHasUniqueMoneyBag:
+                    money = math.ceil(money *moneyLoss)
+                else:
+                    money = math.floor(money * moneyLoss)
                 deathTimer = 0
                 health = maxHealth
                 controlls = "move"
