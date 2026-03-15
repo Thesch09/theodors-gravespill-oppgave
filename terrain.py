@@ -14,7 +14,6 @@ def make_terrain(depth):
             self.maxHeight = maxHeight
             self.chance = chance
             self.uniqueOre = uniqueOre
-
     def addOre(ore, terrain, location):
         if ore.type == "rock":
             terrain[location].ore = ore.name
@@ -30,7 +29,6 @@ def make_terrain(depth):
                 terrain[location].uniqueOre = ore.uniqueOre
         else:
             print("UNDIFINED RESOURCE TYPE")
-    
     def addToTerrain(list, terrain):
         rockTions = [] # A portmanteau of rock and options
         for i in list:
@@ -39,9 +37,14 @@ def make_terrain(depth):
                     rockTions.append(i)
         print(len(rockTions))
         if len(rockTions) >= 1:
-            selectedRockTion = rockTions[random.randint(0, len(rockTions)-1)]
-            if i.type == "rock" or i.type == "mineral" and random.randint(1, selectedRockTion.chance) == 1 and terrain[-1].ore != "" and terrain[-1].ore != "Dirt":
+            if i.type == "rock":
+                selectedRockTion = rockTions[random.randint(0, len(rockTions)-1)]
                 addOre(selectedRockTion, terrain, -1)
+            if i.type == "mineral":
+                for i in rockTions:
+                    if random.randint(1, i.chance) == 1 and terrain[-1].ore != "" and terrain[-1].ore != "Dirt":
+                        addOre(i, terrain, -1)
+                        break
         else:
             pass
 
@@ -54,19 +57,27 @@ def make_terrain(depth):
     bloodstone = ore("rock", "Bloodstone", 500, 150, 15, 298, 449)
     abyssmarine = ore("rock", "Abyssmarine", 1000, 350, 35, 448, 749)
     spaceStone = ore("rock", "Space Stone", 1500, 500, 50, 748, 999)
-    space = ore("rock", "Space", 5000, 1000, 100, 998, 1250)
+    space = ore("rock", "Space", 5000, 1000, 100, 998, depth)
 
     rocks = [dirt, stone, bluestone, redstone, bloodstone, abyssmarine, spaceStone, space]
 
     # Creation of minerals
     # mineralName = ore("mineral", "Name of the mineral for drawing it", hardness, value, damage, minimum height, maximum height, chance for it to appear)
-    coal = ore("mineral", "Coal", 10, 2, 1, 4, 50, 15)
-    iron = ore("mineral", "Iron", 20, 7, 1, 15, 50, 20)
+    coal = ore("mineral", "Coal", 10, 2, 1, 4, 200, 35)
+    iron = ore("mineral", "Iron", 20, 7, 1, 15, 500, 40)
+    star = ore("mineral", "Star", 500, 1000, 25, 750, depth, 30)
+    star2 = ore("mineral", "Large Star", 1000, 2000, 25, 1000, depth, 50)
+    gold = ore("mineral", "Gold", 50, 20, 2, 175, 550, 50)
+    copper = ore("mineral", "Copper", 35, 10, 0, 15, 400, 80)
+    diamond = ore("mineral", "Diamond", 100, 500, 10, 50, 900, 150)
+    rainbowite = ore("mineral", "Rainbowite", 50, 50000, 100, 100, 1200, 1000)
+    bismuth = ore("mineral", "Bismuth", -25, 300, 5, 100, 200, 35)
+    lapisLazuli = ore("mineral", "Lapis Lazuli", 50, 150, 2, 450, 725, 50)
     uniqueOre1 = ore("mineral", "Unique Ore", 100, 15, 5, 0, depth, 100, 1)
     uniqueOre2 = ore("mineral", "Big Unique Ore", 500, 100, 30, 0, depth, 200, 2)
     uniqueOre3 = ore("mineral", "Large Unique Ore", 1000, 1000, 90, 0, depth, 300, 3)
 
-    ores = [coal, iron, uniqueOre1, uniqueOre2, uniqueOre3]
+    ores = [coal, iron, star, star2, gold, copper, diamond, rainbowite, bismuth, lapisLazuli, uniqueOre1, uniqueOre2, uniqueOre3]
 
     # Special stuff
     magma = ore("rock","Magma", 70, 50, 50)

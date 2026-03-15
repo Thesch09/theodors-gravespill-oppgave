@@ -53,6 +53,8 @@ collision = False
 gravity = 5
 world_depth = 1250
 font = pygame.font.Font(None, size=30)
+recentlyBroken = font.render("nothing", True, (255,255,255))
+brokenCooldown = 0
 
 if True: # So that I can hide it in editor
     # PLAYER VISUALS
@@ -319,6 +321,14 @@ def draw_terrain(screen, terrain, camera, depth):
                     screen.blit(uniqueOre2, (i.x, y+camera))
                 if i.extra == 'Large Unique Ore':
                     screen.blit(uniqueOre3, (i.x, y+camera))
+                if i.extra == 'Star':
+                    screen.blit(star, (i.x, y+camera))
+                if i.extra == 'Large Star':
+                    screen.blit(bigStar, (i.x, y+camera))
+                if i.extra == 'Gold':
+                    screen.blit(gold, (i.x, y+camera))
+                if i.extra == 'Lapis Lazuli':
+                    screen.blit(lapisLazuli, (i.x, y+camera))
 
                 # Check if it's broken
                 if i.health < i.hardness/4:
@@ -373,7 +383,6 @@ moneyBagUniqueShop = shopItem(5, True, "Saves 5% of money on death.", moneyBagUn
 
 shop = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop, heartUniqueShop, digPowerUniqueShop, jumpStrengthUniqueShop, moveSpeedUniqueShop, moneyBagUniqueShop]
 
-
 print(len(terrain)/20)
 hitbox = pygame.Rect(x+4, 224, 24, 32)
 digSquare = pygame.Rect(x, 224, 8, 8)
@@ -382,15 +391,48 @@ while running:
     if health < 1:
         screen.fill((122, 0, 0))
     else:
-        screen.fill((112, 224, 255)) # Default
+        screen.fill((137, 210, 255)) # Default
+        if y < -40932:
+            screen.fill((29, 30, 54)) # TRANSITION 1: SPACE -> DEFAULT
+        if y < -100:
+            screen.fill((69, 92, 125)) # TRANSITION 2: SPACE -> DEFAULT
         if y < -742:
-            screen.fill((107, 186, 209)) # TRANSITION 1: DEFAULT -> CAVE 1
+            screen.fill((139, 182, 210)) # TRANSITION 1: DEFAULT -> CAVE 1
         if y < -774:
-            screen.fill((118, 169, 184)) # TRANSITION 2: DEFAULT -> CAVE 1
+            screen.fill((138, 172, 194)) # TRANSITION 2: DEFAULT -> CAVE 1
         if y < -806:
-            screen.fill((118, 139, 145)) # TRANSITION 3: DEFAULT -> CAVE 1
-        if y < -838:
-            screen.fill((122, 122, 122)) # CAVE 1
+            screen.fill((135, 137, 138)) # CAVE 1
+        if y < -3000:
+            screen.fill((112, 124, 131)) # TRANSITION 1: CAVE 1 -> CAVE 2
+        if y < -3032:
+            screen.fill((96, 119, 132)) # TRANSITION 2: CAVE 1 -> CAVE 2
+        if y < -3064:
+            screen.fill((79, 112, 132)) # CAVE 2
+        if y < -5398:
+            screen.fill((88, 101, 117)) # TRANSITION 1: CAVE 2 -> CAVE 3
+        if y < -5430:
+            screen.fill((105, 88, 94)) # TRANSITION 2: CAVE 2 -> CAVE 3
+        if y < -5462:
+            screen.fill((112, 77, 79)) # CAVE 3
+        if y < -10230:
+            screen.fill((115, 67, 72)) # TRANSITION 1: CAVE 3 -> CAVE 4
+        if y < -10262:
+            screen.fill((115, 62, 72)) # TRANSITION 2: CAVE 3 -> CAVE 4
+        if y < -10294:
+            screen.fill((117, 57, 71)) # CAVE 4
+        if y < -15030:
+            screen.fill((103, 54, 74)) # TRANSITION 1: CAVE 4 -> CAVE 5
+        if y < -15062:
+            screen.fill((93, 54, 75)) # TRANSITION 2: CAVE 4 -> CAVE 5
+        if y < -15094:
+            screen.fill((69, 53, 80)) # CAVE 5
+        if y < -24630:
+            screen.fill((34, 34, 64)) # TRANSITION 1: CAVE 5 -> SPACE
+        if y < -24662:
+            screen.fill((24, 19, 44)) # TRANSITION 2: CAVE 5 -> SPACE
+        if y < -24694:
+            screen.fill((4, 0, 10)) # SPACE
+
 
     depth = math.floor(y/32)+22
     
@@ -401,23 +443,36 @@ while running:
     for i in range(len(terrain)): # Breaking of Blocks
         collision = digSquare.colliderect(terrain[i].rect)
         if collision and keyAnyPressed:
-            terrain[i].health -= digPower * delta_time
-            if random.randint(1,20) == 1:
-                digNoises[random.randint(0,2)].play()
-                print("sound")
-            if terrain[i].health <= 0:
-                terrain[i].mined = True
-                health -= terrain[i].damage
-                
-                moneyRepeat = 1
-                if playerHasUniquePickaxe > 0:
-                    moneyRepeat += math.floor(playerHasUniquePickaxe)
-                if terrain[i].extra != '' and terrain[i].extra != 'Grass':
-                    oreBreak.play()
-                elif random.randint(1,3) == 1:
-                    rockBreak.play()
-                money += terrain[i].value * moneyRepeat
-                uniqueOres += terrain[i].uniqueOre * moneyRepeat
+            if maxHealth > terrain[i].damage:
+                terrain[i].health -= digPower * delta_time
+                if random.randint(1,20) == 1:
+                    digNoises[random.randint(0,2)].play()
+                    print("sound")
+                if terrain[i].health <= 0:
+                    terrain[i].mined = True
+                    health -= terrain[i].damage
+                    if terrain[i].extra == "":
+                        recentlyBroken = font.render(f"{terrain[i].ore}", True, (255,255,255))
+                    else:
+                        recentlyBroken = font.render(f"{terrain[i].extra}", True, (255,255,255))
+                    brokenCooldown = 1
+                    moneyRepeat = 1
+                    if playerHasUniquePickaxe > 0:
+                        moneyRepeat += math.floor(playerHasUniquePickaxe)
+                    if terrain[i].extra != '' and terrain[i].extra != 'Grass':
+                        oreBreak.play()
+                    elif random.randint(1,3) == 1:
+                        rockBreak.play()
+                    money += terrain[i].value * moneyRepeat
+                    uniqueOres += terrain[i].uniqueOre * moneyRepeat
+            else:
+                recentlyBroken = font.render(f"Too weak! Need more Max HP", True, (255,255,255))
+                brokenCooldown = 1
+
+    brokenCooldown -= 1*delta_time
+    if brokenCooldown > 0:
+        brokenX = 640-4-recentlyBroken.get_width()
+        screen.blit(recentlyBroken, (brokenX,456))
 
     speedY += gravity
     if speedY > jumpStrength:
@@ -449,10 +504,6 @@ while running:
     playerX = font.render(f"X: {x}", True, (255,255,255))
     velY = font.render(f"Vertical Velocity: {speedY}", True, (255,255,255))
     playerY = font.render(f"Y: {y}", True, (255,255,255))
-    moneyText = font.render(f"${money}", True, (255,255,0))
-    uniqueOreText = font.render(f"UO: {uniqueOres}", True, (122,0,122))
-    healthText = font.render(f"{health}/{maxHealth}", True, (255,0,0))
-    depthText = font.render(f"Depth: {depth}", True, (255,255,255))
 
     hitbox = pygame.Rect(x+4, 224, 24, 32)
     if debugHitbox:
@@ -548,7 +599,11 @@ while running:
                 keySPressed = False
             if event.key == pygame.K_SPACE and controlls == "shop":
                 keySpacePressed = False
-        
+    
+    moneyText = font.render(f"${money}", True, (255,255,0))
+    uniqueOreText = font.render(f"UO: {uniqueOres}", True, (122,0,122))
+    healthText = font.render(f"{health}/{maxHealth}", True, (255,0,0))
+    depthText = font.render(f"Depth: {depth}", True, (255,255,255))
     shopTemp = pygame.Rect(32, 32, 576, 416)
     shopTempOutline = pygame.Rect(30, 30, 580, 420)
     if shopOverlay:
@@ -639,8 +694,6 @@ while running:
                         screen.blit(shopBuy, (540, 64+36*i.slot))
                         shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                         shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
-                        #pygame.draw.rect(screen, (255,0,255), shopCursorHitbox)
-                        #pygame.draw.rect(screen, (0,255,255), shopButtonHitbox)
                         shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
                         if shopCollision and keySpacePressed and moveShop == 1:
                             money -= i.cost
@@ -664,8 +717,6 @@ while running:
                         screen.blit(shopBuyUnique, (540, 64+36*i.slot))
                         shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                         shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
-                        #pygame.draw.rect(screen, (255,0,255), shopCursorHitbox)
-                        #pygame.draw.rect(screen, (0,255,255), shopButtonHitbox)
                         shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
                         if shopCollision and keySpacePressed and moveShop == 1:
                             uniqueOres -= i.cost
@@ -676,7 +727,7 @@ while running:
                                 playerHasUniqueHeart = True
                             if i.sprite == digPowerUnique:
                                 digPower += 20
-                                playerHasUniquePickaxe += 0.25
+                                playerHasUniquePickaxe += 0.5
                             if i.sprite == jumpStrengthUnique:
                                 jumpStrength += 15
                             if i.sprite == moveSpeedUnique:
@@ -752,8 +803,6 @@ while running:
         x = 0
     if x > 608:
         x = 608
-    #print((world_depth+10)*32)
-    #print(terrain[len(terrain)-1].y+20*32*-1)
     if y < (world_depth+50)*32*-1:
         y = -500
         print("loop")
