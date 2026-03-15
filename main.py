@@ -31,6 +31,7 @@ health = maxHealth
 moneyLoss = 0.0 # Float. 0 is lose all, 1 is keep all
 deathTimer = 0
 controlls = "move"
+depth = 0
 playerHasUniqueMoneyBag = False
 playerHasUniqueHeart = False
 playerHasUniquePickaxe = 0.0 # Float so it scales slower
@@ -50,7 +51,7 @@ moveShop = 0
 cam_y = y
 collision = False
 gravity = 5
-world_depth = 450
+world_depth = 1250
 font = pygame.font.Font(None, size=30)
 
 if True: # So that I can hide it in editor
@@ -271,59 +272,61 @@ rockBreak = pygame.mixer.Sound('sfx/rockBreak.wav')
 # Drawing of terrain
 terrain = make_terrain(world_depth)
 print(world_depth)
-def draw_terrain(screen, terrain, camera):
+def draw_terrain(screen, terrain, camera, depth):
     for i in terrain:
         if not i.mined:
             y = i.y + 600
-            # Rock type
-            if i.ore == 'Stone':
-                screen.blit(stone, (i.x, y+camera))
-            if i.ore == 'Dirt':
-                screen.blit(dirt, (i.x, y+camera))
-            if i.ore == 'Bluestone':
-                screen.blit(bluestone, (i.x, y+camera))
-            if i.ore == 'Redstone':
-                screen.blit(redstone, (i.x, y+camera))
-            if i.ore == 'Magma':
-                screen.blit(magma, (i.x, y+camera))
-            if i.ore == 'Space':
-                screen.blit(space, (i.x, y+camera))
-            if i.ore == 'Space Stone':
-                screen.blit(spaceStone, (i.x, y+camera))
-            if i.ore == 'Abyssmarine':
-                screen.blit(abyssmarine, (i.x, y+camera))
-            if i.ore == 'Bloodstone':
-                screen.blit(bloodstone, (i.x, y+camera))
+            
+            if i.deep + 15 > abs(depth) and i.deep - 15 < abs(depth):
+                # Rock type
+                if i.ore == 'Stone':
+                    screen.blit(stone, (i.x, y+camera))
+                if i.ore == 'Dirt':
+                    screen.blit(dirt, (i.x, y+camera))
+                if i.ore == 'Bluestone':
+                    screen.blit(bluestone, (i.x, y+camera))
+                if i.ore == 'Redstone':
+                    screen.blit(redstone, (i.x, y+camera))
+                if i.ore == 'Magma':
+                    screen.blit(magma, (i.x, y+camera))
+                if i.ore == 'Space':
+                    screen.blit(space, (i.x, y+camera))
+                if i.ore == 'Space Stone':
+                    screen.blit(spaceStone, (i.x, y+camera))
+                if i.ore == 'Abyssmarine':
+                    screen.blit(abyssmarine, (i.x, y+camera))
+                if i.ore == 'Bloodstone':
+                    screen.blit(bloodstone, (i.x, y+camera))
 
-            # Ore type
-            if i.extra == 'Grass':
-                screen.blit(grass, (i.x, y+camera))
-            if i.extra == 'Iron':
-                screen.blit(iron, (i.x, y+camera))
-            if i.extra == 'Copper':
-                screen.blit(copper, (i.x, y+camera))
-            if i.extra == 'Coal':
-                screen.blit(coal, (i.x, y+camera))
-            if i.extra == 'Diamond':
-                screen.blit(diamond, (i.x, y+camera))
-            if i.extra == 'Bismuth':
-                screen.blit(bismuth, (i.x, y+camera))
-            if i.extra == 'Rainbowite':
-                screen.blit(rainbowite, (i.x, y+camera))
-            if i.extra == 'Unique Ore':
-                screen.blit(uniqueOre, (i.x, y+camera))
-            if i.extra == 'Big Unique Ore':
-                screen.blit(uniqueOre2, (i.x, y+camera))
-            if i.extra == 'Large Unique Ore':
-                screen.blit(uniqueOre3, (i.x, y+camera))
+                # Ore type
+                if i.extra == 'Grass':
+                    screen.blit(grass, (i.x, y+camera))
+                if i.extra == 'Iron':
+                    screen.blit(iron, (i.x, y+camera))
+                if i.extra == 'Copper':
+                    screen.blit(copper, (i.x, y+camera))
+                if i.extra == 'Coal':
+                    screen.blit(coal, (i.x, y+camera))
+                if i.extra == 'Diamond':
+                    screen.blit(diamond, (i.x, y+camera))
+                if i.extra == 'Bismuth':
+                    screen.blit(bismuth, (i.x, y+camera))
+                if i.extra == 'Rainbowite':
+                    screen.blit(rainbowite, (i.x, y+camera))
+                if i.extra == 'Unique Ore':
+                    screen.blit(uniqueOre, (i.x, y+camera))
+                if i.extra == 'Big Unique Ore':
+                    screen.blit(uniqueOre2, (i.x, y+camera))
+                if i.extra == 'Large Unique Ore':
+                    screen.blit(uniqueOre3, (i.x, y+camera))
 
-            # Check if it's broken
-            if i.health < i.hardness/4:
-                screen.blit(break3, (i.x, y+cam_y))
-            if i.health < i.hardness/4*2:
-                screen.blit(break2, (i.x, y+cam_y))
-            if i.health < i.hardness/4*3:
-                screen.blit(break1, (i.x, y+cam_y))
+                # Check if it's broken
+                if i.health < i.hardness/4:
+                    screen.blit(break3, (i.x, y+cam_y))
+                if i.health < i.hardness/4*2:
+                    screen.blit(break2, (i.x, y+cam_y))
+                if i.health < i.hardness/4*3:
+                    screen.blit(break1, (i.x, y+cam_y))
 
 def collide(playerX):
     hitbox = pygame.Rect(playerX+4, 224, 24, 32)
@@ -332,17 +335,18 @@ def collide(playerX):
         collision = hitbox.colliderect(terrain[i].rect)
         if collision:
             return collision
-def redoGroundRects(terrain, camera):
+def redoGroundRects(terrain, camera, depth):
     hitbox = pygame.Rect(x+4, 226, 24, 32)
     for i in range(len(terrain)):
-        y = terrain[i].y + 600 + camera
-        terrain[i].rect = pygame.Rect(0,0,32,32)
-        if not terrain[i].mined:
-            terrain[i].rect = pygame.Rect(terrain[i].x, y, 32, 32)  # This line causes the hitboxes to appear where the terrain is visually
-        #pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
-        collision = hitbox.colliderect(terrain[i].rect)
-        if collision:
-            break
+        if terrain[i].deep + 15 > abs(depth) and terrain[i].deep - 15 < abs(depth):
+            y = terrain[i].y + 600 + camera
+            terrain[i].rect = pygame.Rect(0,0,32,32)
+            if not terrain[i].mined:
+                terrain[i].rect = pygame.Rect(terrain[i].x, y, 32, 32)  # This line causes the hitboxes to appear where the terrain is visually
+            #pygame.draw.rect(screen, (0, 255, 0), terrain[i].rect)
+            collision = hitbox.colliderect(terrain[i].rect)
+            if collision:
+                break
 
 class shopItem:
     def __init__(self, cost, unique, flavour, sprite, tab, slot, priceIncrease):
@@ -388,12 +392,12 @@ while running:
         if y < -838:
             screen.fill((122, 122, 122)) # CAVE 1
 
-
+    depth = math.floor(y/32)+22
     
     hitbox = pygame.Rect(x+4, 226, 24, 32)
-    redoGroundRects(terrain, cam_y)
+    redoGroundRects(terrain, cam_y, depth)
 
-    draw_terrain(screen, terrain, cam_y)
+    draw_terrain(screen, terrain, cam_y, depth)
     for i in range(len(terrain)): # Breaking of Blocks
         collision = digSquare.colliderect(terrain[i].rect)
         if collision and keyAnyPressed:
@@ -428,19 +432,13 @@ while running:
             jumpable = True
         while collision:
             if speedY < 0:
-                #for i in terrain:
-                    #i.y -= 1
                 y -= 1
             else:
-                #for i in terrain:
-                    #i.y += 1
                 y += 1
             cam_y = y
-            redoGroundRects(terrain, cam_y)
+            redoGroundRects(terrain, cam_y, depth)
             collision = collide(x)
         speedY = 0
-        #for i in terrain:
-            #i.y -= 1
         y -= 1
 
     screen.blit(player, (x, 223))
@@ -452,8 +450,9 @@ while running:
     velY = font.render(f"Vertical Velocity: {speedY}", True, (255,255,255))
     playerY = font.render(f"Y: {y}", True, (255,255,255))
     moneyText = font.render(f"${money}", True, (255,255,0))
-    uniqueOreText = font.render(f"UO:{uniqueOres}", True, (122,0,122))
+    uniqueOreText = font.render(f"UO: {uniqueOres}", True, (122,0,122))
     healthText = font.render(f"{health}/{maxHealth}", True, (255,0,0))
+    depthText = font.render(f"Depth: {depth}", True, (255,255,255))
 
     hitbox = pygame.Rect(x+4, 224, 24, 32)
     if debugHitbox:
@@ -490,11 +489,13 @@ while running:
             if event.key == pygame.K_F1:
                 if debugQOL:
                     debugQOL = False
-                    digPower -= 9000
+                    digPower -= 90000
+                    jumpStrength -= 90000
                     print("DEBUG OFF")
                 else:
                     debugQOL = True
-                    digPower += 9000
+                    digPower += 90000
+                    jumpStrength += 90000
                     print("DEBUG ON")
             if event.key == pygame.K_F2:
                 if debugHitbox:
@@ -514,6 +515,8 @@ while running:
                 speedY = 0
                 y = -640
                 cam_y = y
+                redoGroundRects(terrain, cam_y, depth)
+                draw_terrain(screen, terrain, cam_y, depth)
                 x = 304
                 health = maxHealth
             if event.key == pygame.K_SPACE and controlls == "shop":
@@ -560,6 +563,7 @@ while running:
         screen.blit(uniqueOreText, (4,64))
     screen.blit(heart, (4,4))
     screen.blit(healthText, (36, 10))
+    screen.blit(depthText, (4, 456))
 
     keyAnyPressed = False
     if controlls == "move": # For movement, duh :) 
@@ -750,9 +754,11 @@ while running:
         x = 608
     #print((world_depth+10)*32)
     #print(terrain[len(terrain)-1].y+20*32*-1)
-    if y < (world_depth+30)*32*-1:
-        y = -200
+    if y < (world_depth+50)*32*-1:
+        y = -500
         print("loop")
+    if y > -500:
+        y = (world_depth+50)*32*-1
     if health < 1:
         print(deathTimer)
         keyAnyPressed = False
@@ -771,6 +777,8 @@ while running:
                 controlls = "move"
                 x = 304
                 y = -640
+                redoGroundRects(terrain, cam_y, depth)
+                draw_terrain(screen, terrain, cam_y, depth)
     
     moveShop += 1
     if moveShop > 7:
