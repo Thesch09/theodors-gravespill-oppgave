@@ -54,6 +54,7 @@ shopTabId = 0
 moveShop = 0
 # End of player VARs
 cam_y = y
+renderDistance = 10
 collision = False
 gravity = 200
 world_depth = 1250
@@ -89,46 +90,86 @@ if True: # Hulls
                                 hullOrange.get_height() * 2))
 
 if True: # Tiles
-    stone = pygame.image.load('img/tiles/stoneV2.png').convert_alpha()
-    stone = pygame.transform.scale(stone,
-                                (stone.get_width() * 2,
-                                stone.get_height() * 2))
     dirt = pygame.image.load('img/tiles/dirtV3.png').convert_alpha()
     dirt = pygame.transform.scale(dirt,
                                 (dirt.get_width() * 2,
                                 dirt.get_height() * 2))
-    bluestone = pygame.image.load('img/tiles/bluestone.png').convert_alpha()
-    bluestone = pygame.transform.scale(bluestone,
-                                (bluestone.get_width() * 2,
-                                bluestone.get_height() * 2))
+    dirtBackground = pygame.image.load('img/tiles/dirtBackground.png').convert_alpha()
+    dirtBackground = pygame.transform.scale(dirtBackground,
+                                (dirtBackground.get_width() * 2,
+                                dirtBackground.get_height() * 2))
     grass = pygame.image.load('img/tiles/grass.png').convert_alpha()
     grass = pygame.transform.scale(grass,
                                 (grass.get_width() * 2,
                                 grass.get_height() * 2))
+    grassBackground = pygame.image.load('img/tiles/grassBackground.png').convert_alpha()
+    grassBackground = pygame.transform.scale(grassBackground,
+                                (grassBackground.get_width() * 2,
+                                grassBackground.get_height() * 2))
+    stone = pygame.image.load('img/tiles/stoneV2.png').convert_alpha()
+    stone = pygame.transform.scale(stone,
+                                (stone.get_width() * 2,
+                                stone.get_height() * 2))
+    stoneBackground = pygame.image.load('img/tiles/stoneBackground.png').convert_alpha()
+    stoneBackground = pygame.transform.scale(stoneBackground,
+                                (stoneBackground.get_width() * 2,
+                                stoneBackground.get_height() * 2))
+    bluestone = pygame.image.load('img/tiles/bluestone.png').convert_alpha()
+    bluestone = pygame.transform.scale(bluestone,
+                                (bluestone.get_width() * 2,
+                                bluestone.get_height() * 2))
+    bluestoneBackground = pygame.image.load('img/tiles/bluestoneBackground.png').convert_alpha()
+    bluestoneBackground = pygame.transform.scale(bluestoneBackground,
+                                (bluestoneBackground.get_width() * 2,
+                                bluestoneBackground.get_height() * 2))
     redstone = pygame.image.load('img/tiles/redstone.png').convert_alpha()
     redstone = pygame.transform.scale(redstone,
                                 (redstone.get_width() * 2,
                                 redstone.get_height() * 2))
+    redstoneBackground = pygame.image.load('img/tiles/redstoneBackground.png').convert_alpha()
+    redstoneBackground = pygame.transform.scale(redstoneBackground,
+                                (redstoneBackground.get_width() * 2,
+                                redstoneBackground.get_height() * 2))
     spaceStone = pygame.image.load('img/tiles/spaceStone.png').convert_alpha()
     spaceStone = pygame.transform.scale(spaceStone,
                                 (spaceStone.get_width() * 2,
                                 spaceStone.get_height() * 2))
+    spaceStoneBackground = pygame.image.load('img/tiles/spaceStoneBackground.png').convert_alpha()
+    spaceStoneBackground = pygame.transform.scale(spaceStoneBackground,
+                                (spaceStoneBackground.get_width() * 2,
+                                spaceStoneBackground.get_height() * 2))
     space = pygame.image.load('img/tiles/space.png').convert_alpha()
     space = pygame.transform.scale(space,
                                 (space.get_width() * 2,
                                 space.get_height() * 2))
+    spaceBackground = pygame.image.load('img/tiles/spaceBackground.png').convert_alpha()
+    spaceBackground = pygame.transform.scale(spaceBackground,
+                                (spaceBackground.get_width() * 2,
+                                spaceBackground.get_height() * 2))
     bloodstone = pygame.image.load('img/tiles/bloodstoneV2.png').convert_alpha()
     bloodstone = pygame.transform.scale(bloodstone,
                                 (bloodstone.get_width() * 2,
                                 bloodstone.get_height() * 2))
+    bloodstoneBackground = pygame.image.load('img/tiles/bloodstoneBackground.png').convert_alpha()
+    bloodstoneBackground = pygame.transform.scale(bloodstoneBackground,
+                                (bloodstoneBackground.get_width() * 2,
+                                bloodstoneBackground.get_height() * 2))
     abyssmarine = pygame.image.load('img/tiles/abyssmarine.png').convert_alpha()
     abyssmarine = pygame.transform.scale(abyssmarine,
                                 (abyssmarine.get_width() * 2,
                                 abyssmarine.get_height() * 2))
+    abyssmarineBackground = pygame.image.load('img/tiles/abyssmarineBackground.png').convert_alpha()
+    abyssmarineBackground = pygame.transform.scale(abyssmarineBackground,
+                                (abyssmarineBackground.get_width() * 2,
+                                abyssmarineBackground.get_height() * 2))
     magma = pygame.image.load('img/tiles/magma.png').convert_alpha()
     magma = pygame.transform.scale(magma,
                                 (magma.get_width() * 2,
                                 magma.get_height() * 2))
+    magmaBackground = pygame.image.load('img/tiles/magmaBackground.png').convert_alpha()
+    magmaBackground = pygame.transform.scale(magmaBackground,
+                                (magmaBackground.get_width() * 2,
+                                magmaBackground.get_height() * 2))
     
 if True: # Ores
     iron = pygame.image.load('img/ores/iron.png').convert_alpha()
@@ -314,67 +355,91 @@ terrain = make_terrain(world_depth)
 print(world_depth)
 def draw_terrain(screen, terrain, camera, depth):
     for i in terrain:
-        if not i.mined:
-            y = i.y + 600
+        y = i.y + 600 + camera
+
+        if not i.mined and i.deep + renderDistance > abs(depth) and i.deep - renderDistance < abs(depth): # Not mined
             
-            if i.deep + 15 > abs(depth) and i.deep - 15 < abs(depth):
-                # Rock type
-                if i.ore == 'Stone':
-                    screen.blit(stone, (i.x, y+camera))
-                if i.ore == 'Dirt':
-                    screen.blit(dirt, (i.x, y+camera))
-                if i.ore == 'Bluestone':
-                    screen.blit(bluestone, (i.x, y+camera))
-                if i.ore == 'Redstone':
-                    screen.blit(redstone, (i.x, y+camera))
-                if i.ore == 'Magma':
-                    screen.blit(magma, (i.x, y+camera))
-                if i.ore == 'Space':
-                    screen.blit(space, (i.x, y+camera))
-                if i.ore == 'Space Stone':
-                    screen.blit(spaceStone, (i.x, y+camera))
-                if i.ore == 'Abyssmarine':
-                    screen.blit(abyssmarine, (i.x, y+camera))
-                if i.ore == 'Bloodstone':
-                    screen.blit(bloodstone, (i.x, y+camera))
+            # Rock type
+            if i.ore == 'Stone':
+                screen.blit(stone, (i.x, y))
+            if i.ore == 'Dirt':
+                screen.blit(dirt, (i.x, y))
+            if i.ore == 'Bluestone':
+                screen.blit(bluestone, (i.x, y))
+            if i.ore == 'Redstone':
+                screen.blit(redstone, (i.x, y))
+            if i.ore == 'Magma':
+                screen.blit(magma, (i.x, y))
+            if i.ore == 'Space':
+                screen.blit(space, (i.x, y))
+            if i.ore == 'Space Stone':
+                screen.blit(spaceStone, (i.x, y))
+            if i.ore == 'Abyssmarine':
+                screen.blit(abyssmarine, (i.x, y))
+            if i.ore == 'Bloodstone':
+                screen.blit(bloodstone, (i.x, y))
 
-                # Ore type
-                if i.extra == 'Grass':
-                    screen.blit(grass, (i.x, y+camera))
-                if i.extra == 'Iron':
-                    screen.blit(iron, (i.x, y+camera))
-                if i.extra == 'Copper':
-                    screen.blit(copper, (i.x, y+camera))
-                if i.extra == 'Coal':
-                    screen.blit(coal, (i.x, y+camera))
-                if i.extra == 'Diamond':
-                    screen.blit(diamond, (i.x, y+camera))
-                if i.extra == 'Bismuth':
-                    screen.blit(bismuth, (i.x, y+camera))
-                if i.extra == 'Rainbowite':
-                    screen.blit(rainbowite, (i.x, y+camera))
-                if i.extra == 'Unique Ore':
-                    screen.blit(uniqueOre, (i.x, y+camera))
-                if i.extra == 'Big Unique Ore':
-                    screen.blit(uniqueOre2, (i.x, y+camera))
-                if i.extra == 'Large Unique Ore':
-                    screen.blit(uniqueOre3, (i.x, y+camera))
-                if i.extra == 'Star':
-                    screen.blit(star, (i.x, y+camera))
-                if i.extra == 'Large Star':
-                    screen.blit(bigStar, (i.x, y+camera))
-                if i.extra == 'Gold':
-                    screen.blit(gold, (i.x, y+camera))
-                if i.extra == 'Lapis Lazuli':
-                    screen.blit(lapisLazuli, (i.x, y+camera))
+            # Ore type
+            if i.extra == 'Grass':
+                screen.blit(grass, (i.x, y))
+            if i.extra == 'Iron':
+                screen.blit(iron, (i.x, y))
+            if i.extra == 'Copper':
+                screen.blit(copper, (i.x, y))
+            if i.extra == 'Coal':
+                screen.blit(coal, (i.x, y))
+            if i.extra == 'Diamond':
+                screen.blit(diamond, (i.x, y))
+            if i.extra == 'Bismuth':
+                screen.blit(bismuth, (i.x, y))
+            if i.extra == 'Rainbowite':
+                screen.blit(rainbowite, (i.x, y))
+            if i.extra == 'Unique Ore':
+                screen.blit(uniqueOre, (i.x, y))
+            if i.extra == 'Big Unique Ore':
+                screen.blit(uniqueOre2, (i.x, y))
+            if i.extra == 'Large Unique Ore':
+                screen.blit(uniqueOre3, (i.x, y))
+            if i.extra == 'Star':
+                screen.blit(star, (i.x, y))
+            if i.extra == 'Large Star':
+                screen.blit(bigStar, (i.x, y))
+            if i.extra == 'Gold':
+                screen.blit(gold, (i.x, y))
+            if i.extra == 'Lapis Lazuli':
+                screen.blit(lapisLazuli, (i.x, y))
 
-                # Check if it's broken
-                if i.health < i.hardness/4:
-                    screen.blit(break3, (i.x, y+cam_y))
-                if i.health < i.hardness/4*2:
-                    screen.blit(break2, (i.x, y+cam_y))
-                if i.health < i.hardness/4*3:
-                    screen.blit(break1, (i.x, y+cam_y))
+            # Check if it's broken
+            if i.health < i.hardness/4:
+                screen.blit(break3, (i.x, y))
+            if i.health < i.hardness/4*2:
+                screen.blit(break2, (i.x, y))
+            if i.health < i.hardness/4*3:
+                screen.blit(break1, (i.x, y))
+        
+        if i.mined and i.deep + renderDistance > abs(depth) and i.deep - renderDistance < abs(depth): # Mined
+            if i.ore == 'Dirt':
+                screen.blit(dirtBackground, (i.x, y))
+            if i.ore == 'Stone':
+                screen.blit(stoneBackground, (i.x, y))
+            if i.ore == 'Bluestone':
+                screen.blit(bluestoneBackground, (i.x, y))
+            if i.ore == 'Redstone':
+                screen.blit(redstoneBackground, (i.x, y))
+            if i.ore == 'Bloodstone':
+                screen.blit(bloodstoneBackground, (i.x, y))
+            if i.ore == 'Space Stone':
+                screen.blit(spaceStoneBackground, (i.x, y))
+            if i.ore == 'Abyssmarine':
+                screen.blit(abyssmarineBackground, (i.x, y))
+            if i.ore == 'Space':
+                screen.blit(spaceBackground, (i.x, y))
+            if i.ore == 'Magma':
+                screen.blit(magmaBackground, (i.x, y))
+
+            # Check for grass
+            if i.extra == 'Grass':
+                screen.blit(grassBackground, (i.x, y))
 
 def collide(playerX):
     hitbox = pygame.Rect(playerX+4, 224, 24, 32)
@@ -386,7 +451,7 @@ def collide(playerX):
 def redoGroundRects(terrain, camera, depth):
     hitbox = pygame.Rect(x+4, 226, 24, 32)
     for i in range(len(terrain)):
-        if terrain[i].deep + 15 > abs(depth) and terrain[i].deep - 15 < abs(depth):
+        if terrain[i].deep + renderDistance > abs(depth) and terrain[i].deep - renderDistance < abs(depth):
             y = terrain[i].y + 600 + camera
             terrain[i].rect = pygame.Rect(0,0,32,32)
             if not terrain[i].mined:
@@ -763,7 +828,7 @@ while running:
                         shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                         shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
                         shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
-                        if shopCollision and keySpacePressed and moveShop == 1:
+                        if shopCollision and keySpacePressed and moveShop <= 0:
                             if not debugMoney:
                                 money -= i.cost
                             i.cost = math.floor(i.cost*i.priceIncrease)

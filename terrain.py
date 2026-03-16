@@ -114,10 +114,8 @@ def make_terrain(depth):
             if height >= 175 and height <= 700 and random.randint(1, 50) == 1:
                 addOre(magma, terrain, -1)
             if height >= 1200 and random.randint(1,4) == 1:
-                terrain[-1].ore = ""
                 terrain[-1].mined = True
             if height >= 1248 and random.randint(1,2) == 1:
-                terrain[-1].ore = ""
                 terrain[-1].mined = True
 
             # Minerals
