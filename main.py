@@ -224,6 +224,34 @@ if True: # Ores
     lapisLazuli = pygame.transform.scale(lapisLazuli,
                                 (lapisLazuli.get_width() * 2,
                                 lapisLazuli.get_height() * 2))
+    eyeBlue = pygame.image.load('img/ores/eyeBlue.png').convert_alpha()
+    eyeBlue = pygame.transform.scale(eyeBlue,
+                                (eyeBlue.get_width() * 2,
+                                eyeBlue.get_height() * 2))
+    eyeBlueSquint = pygame.image.load('img/ores/eyeBlueSquint.png').convert_alpha()
+    eyeBlueSquint = pygame.transform.scale(eyeBlueSquint,
+                                (eyeBlueSquint.get_width() * 2,
+                                eyeBlueSquint.get_height() * 2))
+    eyeGreen = pygame.image.load('img/ores/eyeGreen.png').convert_alpha()
+    eyeGreen = pygame.transform.scale(eyeGreen,
+                                (eyeGreen.get_width() * 2,
+                                eyeGreen.get_height() * 2))
+    eyeGreenSquint = pygame.image.load('img/ores/eyeGreenSquint.png').convert_alpha()
+    eyeGreenSquint = pygame.transform.scale(eyeGreenSquint,
+                                (eyeGreenSquint.get_width() * 2,
+                                eyeGreenSquint.get_height() * 2))
+    eyeRed = pygame.image.load('img/ores/eyeRed.png').convert_alpha()
+    eyeRed = pygame.transform.scale(eyeRed,
+                                (eyeRed.get_width() * 2,
+                                eyeRed.get_height() * 2))
+    eyeRedSquint = pygame.image.load('img/ores/eyeRedSquint.png').convert_alpha()
+    eyeRedSquint = pygame.transform.scale(eyeRedSquint,
+                                (eyeRedSquint.get_width() * 2,
+                                eyeRedSquint.get_height() * 2))
+    mouth = pygame.image.load('img/ores/mouth.png').convert_alpha()
+    mouth = pygame.transform.scale(mouth,
+                                (mouth.get_width() * 2,
+                                mouth.get_height() * 2))
     
 if True: # Upgrades
     heart = pygame.image.load('img/upgrades/heart.png').convert_alpha()
@@ -408,6 +436,20 @@ def draw_terrain(screen, terrain, camera, depth):
                 screen.blit(gold, (i.x, y))
             if i.extra == 'Lapis Lazuli':
                 screen.blit(lapisLazuli, (i.x, y))
+            if i.extra == 'Blue Eye':
+                screen.blit(eyeBlue, (i.x, y))
+            if i.extra == 'Squinting Blue Eye':
+                screen.blit(eyeBlueSquint, (i.x, y))
+            if i.extra == 'Green Eye':
+                screen.blit(eyeGreen, (i.x, y))
+            if i.extra == 'Squinting Green Eye':
+                screen.blit(eyeGreenSquint, (i.x, y))
+            if i.extra == 'Red Eye':
+                screen.blit(eyeRed, (i.x, y))
+            if i.extra == 'Squinting Red Eye':
+                screen.blit(eyeRedSquint, (i.x, y))
+            if i.extra == "Mouth":
+                screen.blit(mouth, (i.x, y))
 
             # Check if it's broken
             if i.health < i.hardness/4:

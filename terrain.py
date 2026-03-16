@@ -21,7 +21,12 @@ def make_terrain(depth):
             terrain[location].value = ore.value
             terrain[location].damage = ore.damage
         elif ore.type == "mineral":
-            terrain[location].extra = ore.name
+            if ore.name == "eye":
+                terrain[location].extra = eyes[random.randint(0,2)]
+            elif ore.name == "squint":
+                terrain[location].extra = f"Squinting {eyes[random.randint(0,2)]}"
+            else:
+                terrain[location].extra = ore.name
             terrain[location].hardness += ore.hardness
             terrain[location].value += ore.value
             terrain[location].damage += ore.damage
@@ -75,8 +80,12 @@ def make_terrain(depth):
     uniqueOre1 = ore("mineral", "Unique Ore", 100, 15, 5, 0, depth, 100, 1)
     uniqueOre2 = ore("mineral", "Big Unique Ore", 500, 100, 30, 0, depth, 200, 2)
     uniqueOre3 = ore("mineral", "Large Unique Ore", 1000, 1000, 90, 0, depth, 300, 3)
+    eye = ore("mineral", "eye", 100, 50, 0, 300, 440, 90)
+    eyeSquint = ore("mineral", "squint", 150, 50, 0, 300, 440, 90)
+    mouth = ore("mineral", "Mouth", 200, 200, 20, 300, 440, 80)
 
-    ores = [coal, iron, star, star2, gold, copper, diamond, rainbowite, bismuth, lapisLazuli, uniqueOre1, uniqueOre2, uniqueOre3]
+    eyes = ["Blue Eye","Green Eye","Red Eye"]
+    ores = [coal, iron, star, star2, gold, copper, diamond, rainbowite, bismuth, lapisLazuli, uniqueOre1, uniqueOre2, uniqueOre3, eye, eyeSquint, mouth]
 
     # Special stuff
     magma = ore("rock","Magma", 70, 50, 50)
