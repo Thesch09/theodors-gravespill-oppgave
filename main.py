@@ -12,10 +12,15 @@ screen = pygame.display.set_mode((640, 480), flags)
 running = True
 clock = pygame.time.Clock()
 deltaTime = 0.1
-debugQOL = False
+shopOverlay = False
+# Debug
+debugUsed = False
+debugDig = False
 debugHitbox = False
 debugMovement = False
-shopOverlay = False
+debugHealth = False
+debugJump = False
+debugMoney = False
 # Player VARs
 x = 304
 y = -640
@@ -263,11 +268,31 @@ if True: # Shop buttons and titles
                                 (stats2.get_width() * 2,
                                 stats2.get_height() * 2))
 
-if False: # Debug icons
-    shopBuy = pygame.image.load('img/shopBuy.png').convert_alpha()
-    shopBuy = pygame.transform.scale(shopBuy,
-                                (shopBuy.get_width() * 2,
-                                shopBuy.get_height() * 2))
+if True: # Debug icons
+    debugIcon = pygame.image.load('img/debug/debug.png').convert_alpha()
+    debugIcon = pygame.transform.scale(debugIcon,
+                                (debugIcon.get_width() * 2,
+                                debugIcon.get_height() * 2))
+    debugHealthIcon = pygame.image.load('img/debug/debugHealth.png').convert_alpha()
+    debugHealthIcon = pygame.transform.scale(debugHealthIcon,
+                                (debugHealthIcon.get_width() * 2,
+                                debugHealthIcon.get_height() * 2))
+    debugHitboxIcon = pygame.image.load('img/debug/debugHitbox.png').convert_alpha()
+    debugHitboxIcon = pygame.transform.scale(debugHitboxIcon,
+                                (debugHitboxIcon.get_width() * 2,
+                                debugHitboxIcon.get_height() * 2))
+    debugJumpIcon = pygame.image.load('img/debug/debugJump.png').convert_alpha()
+    debugJumpIcon = pygame.transform.scale(debugJumpIcon,
+                                (debugJumpIcon.get_width() * 2,
+                                debugJumpIcon.get_height() * 2))
+    debugMoneyIcon = pygame.image.load('img/debug/debugMoney.png').convert_alpha()
+    debugMoneyIcon = pygame.transform.scale(debugMoneyIcon,
+                                (debugMoneyIcon.get_width() * 2,
+                                debugMoneyIcon.get_height() * 2))
+    debugStatsIcon = pygame.image.load('img/debug/debugStats.png').convert_alpha()
+    debugStatsIcon = pygame.transform.scale(debugStatsIcon,
+                                (debugStatsIcon.get_width() * 2,
+                                debugStatsIcon.get_height() * 2))
 
 drill = drillGrey
 player = hullOrange
@@ -448,7 +473,7 @@ while running:
             screen.fill((4, 0, 10)) # SPACE
 
 
-    depth = math.floor(y/32)+22
+    depth = math.floor(y/32)+23
     
     hitbox = pygame.Rect(x+4, 226, 24, 32)
     redoGroundRects(terrain, cam_y, depth)
@@ -457,7 +482,7 @@ while running:
     for i in range(len(terrain)): # Breaking of Blocks
         collision = digSquare.colliderect(terrain[i].rect)
         if collision and keyAnyPressed:
-            if maxHealth > terrain[i].damage:
+            if maxHealth > terrain[i].damage or debugHealth:
                 terrain[i].health -= digPower * deltaTime
                 if random.randint(1,20) == 1:
                     digNoises[random.randint(0,2)].play()
@@ -529,9 +554,8 @@ while running:
         screen.blit(playerX, (4,94))
         screen.blit(playerY, (4,124))
         screen.blit(velY, (4,154))
-    if debugQOL:
+    if debugHealth:
         health = maxHealth
-        jumpable = True
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -551,31 +575,6 @@ while running:
             if event.key == pygame.K_s:
                 print("S down")
                 keySPressed = True
-            if event.key == pygame.K_F1:
-                if debugQOL:
-                    debugQOL = False
-                    digPower -= 90000
-                    jumpStrength -= 90000
-                    print("DEBUG OFF")
-                else:
-                    debugQOL = True
-                    digPower += 90000
-                    jumpStrength += 90000
-                    print("DEBUG ON")
-            if event.key == pygame.K_F2:
-                if debugHitbox:
-                    debugHitbox = False
-                    print("DEBUG OFF")
-                else:
-                    debugHitbox = True
-                    print("DEBUG ON")
-            if event.key == pygame.K_F3:
-                if debugMovement:
-                    debugMovement = False
-                    print("DEBUG OFF")
-                else:
-                    debugMovement = True
-                    print("DEBUG ON")
             if event.key == pygame.K_SPACE and controlls == "move":
                 speedY = 0
                 y = -640
@@ -584,6 +583,7 @@ while running:
                 draw_terrain(screen, terrain, cam_y, depth)
                 x = 304
                 health = maxHealth
+            # Shop
             if event.key == pygame.K_SPACE and controlls == "shop":
                 keySpacePressed = True
             if event.key == pygame.K_ESCAPE:
@@ -596,6 +596,60 @@ while running:
                     controlls = "shop"
                     shopCursorSlot = 0
                     shopTabId = 0
+                    moveShop = 0
+            # Debug
+            if event.key == pygame.K_F1:
+                if debugDig:
+                    debugDig = False
+                    digPower -= 90000
+                    print("Insane dig power: Off")
+                else:
+                    debugDig = True
+                    digPower += 90000
+                    debugUsed = True
+                    print("Insane dig power: On")
+            if event.key == pygame.K_F2:
+                if debugHitbox:
+                    debugHitbox = False
+                    print("Show hitboxes: Off")
+                else:
+                    debugHitbox = True
+                    debugUsed = True
+                    print("Show hitboxes: On")
+            if event.key == pygame.K_F3:
+                if debugMovement:
+                    debugMovement = False
+                    print("Movement info: Off")
+                else:
+                    debugMovement = True
+                    debugUsed = True
+                    print("Movement info: On")
+            if event.key == pygame.K_F4:
+                if debugHealth:
+                    debugHealth = False
+                    print("Infinite health: Off")
+                else:
+                    debugHealth = True
+                    debugUsed = True
+                    print("Infinite health: On")
+            if event.key == pygame.K_F5:
+                if debugJump:
+                    jumpStrength -= 1000
+                    debugJump = False
+                    print("Insane jump power: Off")
+                else:
+                    debugJump = True
+                    jumpStrength += 1000
+                    debugUsed = True
+                    print("Insane jump power: On")
+            if event.key == pygame.K_F6:
+                if debugMoney:
+                    debugMoney = False
+                    print("Infinite money: Off")
+                else:
+                    debugMoney = True
+                    debugUsed = True
+                    print("Infinite money: On")
 
         #Checking for when a button is released
         if event.type == pygame.KEYUP:
@@ -704,13 +758,14 @@ while running:
                 screen.blit(i.sprite, (32, 64+36*i.slot))
                 screen.blit(shopText, (64, 72+36*i.slot))
                 if not i.unique:
-                    if money >= i.cost:
+                    if money >= i.cost or debugMoney:
                         screen.blit(shopBuy, (540, 64+36*i.slot))
                         shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                         shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
                         shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
                         if shopCollision and keySpacePressed and moveShop == 1:
-                            money -= i.cost
+                            if not debugMoney:
+                                money -= i.cost
                             i.cost = math.floor(i.cost*i.priceIncrease)
                             if i.sprite == heart:
                                 maxHealth += 5
@@ -727,13 +782,14 @@ while running:
                     else:
                         screen.blit(shopPoor, (540, 64+36*i.slot))
                 if i.unique:
-                    if uniqueOres >= i.cost:
+                    if uniqueOres >= i.cost or debugMoney:
                         screen.blit(shopBuyUnique, (540, 64+36*i.slot))
                         shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                         shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
                         shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
-                        if shopCollision and keySpacePressed and moveShop == 1:
-                            uniqueOres -= i.cost
+                        if shopCollision and keySpacePressed and moveShop <= 0:
+                            if not debugMoney:
+                                uniqueOres -= i.cost
                             i.cost = math.floor(i.cost*i.priceIncrease)
                             if i.sprite == heartUnique:
                                 maxHealth += 15
@@ -793,11 +849,13 @@ while running:
                     screen.blit(shopText2, (64, 104+68*i.slot))
         if shopTab[shopTabId] != "stats" and shopTab[shopTabId] != "stats 2":
             screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
-        if moveShop == 1:
+        if moveShop <= 0:
             if keySPressed:
                 shopCursorSlot += 1
+                moveShop = 1
             if keyWPressed:
                 shopCursorSlot -= 1
+                moveShop = 1
             if shopCursorSlot < 0:
                 shopCursorSlot = 4
             if shopCursorSlot > 4:
@@ -805,13 +863,17 @@ while running:
             if keyDPressed:
                 shopTabId += 1
                 shopCursorSlot = 0
+                moveShop = 1
             if keyAPressed:
                 shopTabId -= 1
                 shopCursorSlot = 0
+                moveShop = 1
             if shopTabId < 0:
                 shopTabId = 5
             if shopTabId > 5:
                 shopTabId = 0
+        else:
+            moveShop -= 2*deltaTime
 
     if x < 0:
         x = 0
@@ -822,6 +884,7 @@ while running:
         print("loop")
     if y > -300:
         y = (world_depth+50)*32*-1
+    
     if health < 1:
         print(deathTimer)
         keyAnyPressed = False
@@ -843,9 +906,18 @@ while running:
                 redoGroundRects(terrain, cam_y, depth)
                 draw_terrain(screen, terrain, cam_y, depth)
     
-    moveShop += 1
-    if moveShop > 7:
-        moveShop = 0
+    if debugUsed:
+        screen.blit(debugIcon, (608, 0))
+        if debugMovement:
+            screen.blit(debugStatsIcon, (576, 0))
+        if debugHitbox:
+            screen.blit(debugHitboxIcon, (544, 0))
+        if debugHealth:
+            screen.blit(debugHealthIcon, (512, 0))
+        if debugJump:
+            screen.blit(debugJumpIcon, (480, 0))
+        if debugMoney:
+            screen.blit(debugMoneyIcon, (448, 0))
 
     # end stuff
     pygame.display.flip()
