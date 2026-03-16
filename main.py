@@ -57,207 +57,220 @@ recentlyBroken = font.render("nothing", True, (255,255,255))
 brokenCooldown = 0
 
 # These are if Trues so that I can hide them in editor
-if True: # PLAYER VISUALS
-    drill = pygame.image.load('img/drillNormalV2.png').convert_alpha()
-    drill = pygame.transform.scale(drill,
-                                (drill.get_width() * 2,
-                                drill.get_height() * 2))
-    player = pygame.image.load('img/drillBodyOrange.png').convert_alpha()
-    player = pygame.transform.scale(player,
-                                (player.get_width() * 2,
-                                player.get_height() * 2))
-    break1 = pygame.image.load('img/break1.png').convert_alpha()
+if True: # Breakage
+    break1 = pygame.image.load('img/gui/break1.png').convert_alpha()
     break1 = pygame.transform.scale(break1,
                                 (break1.get_width() * 2,
                                 break1.get_height() * 2))
-    break2 = pygame.image.load('img/break2.png').convert_alpha()
+    break2 = pygame.image.load('img/gui/break2.png').convert_alpha()
     break2 = pygame.transform.scale(break2,
                                 (break2.get_width() * 2,
                                 break2.get_height() * 2))
-    break3 = pygame.image.load('img/break3.png').convert_alpha()
+    break3 = pygame.image.load('img/gui/break3.png').convert_alpha()
     break3 = pygame.transform.scale(break3,
                                 (break3.get_width() * 2,
                                 break3.get_height() * 2))
-    
-if True: # Ground
-    stone = pygame.image.load('img/stoneV2.png').convert_alpha()
+
+if True: # Drills
+    drillGrey = pygame.image.load('img/drill/drillGrey.png').convert_alpha()
+    drillGrey = pygame.transform.scale(drillGrey,
+                                (drillGrey.get_width() * 2,
+                                drillGrey.get_height() * 2))
+
+if True: # Hulls
+    hullOrange = pygame.image.load('img/hull/hullOrange.png').convert_alpha()
+    hullOrange = pygame.transform.scale(hullOrange,
+                                (hullOrange.get_width() * 2,
+                                hullOrange.get_height() * 2))
+
+if True: # Tiles
+    stone = pygame.image.load('img/tiles/stoneV2.png').convert_alpha()
     stone = pygame.transform.scale(stone,
                                 (stone.get_width() * 2,
                                 stone.get_height() * 2))
-    dirt = pygame.image.load('img/dirtV3.png').convert_alpha()
+    dirt = pygame.image.load('img/tiles/dirtV3.png').convert_alpha()
     dirt = pygame.transform.scale(dirt,
                                 (dirt.get_width() * 2,
                                 dirt.get_height() * 2))
-    bluestone = pygame.image.load('img/bluestone.png').convert_alpha()
+    bluestone = pygame.image.load('img/tiles/bluestone.png').convert_alpha()
     bluestone = pygame.transform.scale(bluestone,
                                 (bluestone.get_width() * 2,
                                 bluestone.get_height() * 2))
-    grass = pygame.image.load('img/grass.png').convert_alpha()
+    grass = pygame.image.load('img/tiles/grass.png').convert_alpha()
     grass = pygame.transform.scale(grass,
                                 (grass.get_width() * 2,
                                 grass.get_height() * 2))
-    redstone = pygame.image.load('img/redstone.png').convert_alpha()
+    redstone = pygame.image.load('img/tiles/redstone.png').convert_alpha()
     redstone = pygame.transform.scale(redstone,
                                 (redstone.get_width() * 2,
                                 redstone.get_height() * 2))
-    spaceStone = pygame.image.load('img/spaceStone.png').convert_alpha()
+    spaceStone = pygame.image.load('img/tiles/spaceStone.png').convert_alpha()
     spaceStone = pygame.transform.scale(spaceStone,
                                 (spaceStone.get_width() * 2,
                                 spaceStone.get_height() * 2))
-    space = pygame.image.load('img/space.png').convert_alpha()
+    space = pygame.image.load('img/tiles/space.png').convert_alpha()
     space = pygame.transform.scale(space,
                                 (space.get_width() * 2,
                                 space.get_height() * 2))
-    bloodstone = pygame.image.load('img/bloodstone.png').convert_alpha()
+    bloodstone = pygame.image.load('img/tiles/bloodstoneV2.png').convert_alpha()
     bloodstone = pygame.transform.scale(bloodstone,
                                 (bloodstone.get_width() * 2,
                                 bloodstone.get_height() * 2))
-    abyssmarine = pygame.image.load('img/abyssmarine.png').convert_alpha()
+    abyssmarine = pygame.image.load('img/tiles/abyssmarine.png').convert_alpha()
     abyssmarine = pygame.transform.scale(abyssmarine,
                                 (abyssmarine.get_width() * 2,
                                 abyssmarine.get_height() * 2))
-    magma = pygame.image.load('img/magma.png').convert_alpha()
+    magma = pygame.image.load('img/tiles/magma.png').convert_alpha()
     magma = pygame.transform.scale(magma,
                                 (magma.get_width() * 2,
                                 magma.get_height() * 2))
     
 if True: # Ores
-    iron = pygame.image.load('img/iron.png').convert_alpha()
+    iron = pygame.image.load('img/ores/iron.png').convert_alpha()
     iron = pygame.transform.scale(iron,
                                 (iron.get_width() * 2,
                                 iron.get_height() * 2))
-    copper = pygame.image.load('img/copper.png').convert_alpha()
+    copper = pygame.image.load('img/ores/copper.png').convert_alpha()
     copper = pygame.transform.scale(copper,
                                 (copper.get_width() * 2,
                                 copper.get_height() * 2))
-    diamond = pygame.image.load('img/diamond.png').convert_alpha()
+    diamond = pygame.image.load('img/ores/diamond.png').convert_alpha()
     diamond = pygame.transform.scale(diamond,
                                 (diamond.get_width() * 2,
                                 diamond.get_height() * 2))
-    bismuth = pygame.image.load('img/bismuth.png').convert_alpha()
+    bismuth = pygame.image.load('img/ores/bismuth.png').convert_alpha()
     bismuth = pygame.transform.scale(bismuth,
                                 (bismuth.get_width() * 2,
                                 bismuth.get_height() * 2))
-    coal = pygame.image.load('img/coal.png').convert_alpha()
+    coal = pygame.image.load('img/ores/coal.png').convert_alpha()
     coal = pygame.transform.scale(coal,
                                 (coal.get_width() * 2,
                                 coal.get_height() * 2))
-    rainbowite = pygame.image.load('img/rainbowite.png').convert_alpha()
+    rainbowite = pygame.image.load('img/ores/rainbowite.png').convert_alpha()
     rainbowite = pygame.transform.scale(rainbowite,
                                 (rainbowite.get_width() * 2,
                                 rainbowite.get_height() * 2))
-    uniqueOre = pygame.image.load('img/uniqueOre.png').convert_alpha()
+    uniqueOre = pygame.image.load('img/ores/uniqueOre.png').convert_alpha()
     uniqueOre = pygame.transform.scale(uniqueOre,
                                 (uniqueOre.get_width() * 2,
                                 uniqueOre.get_height() * 2))
-    uniqueOre2 = pygame.image.load('img/uniqueOre2.png').convert_alpha()
+    uniqueOre2 = pygame.image.load('img/ores/uniqueOre2.png').convert_alpha()
     uniqueOre2 = pygame.transform.scale(uniqueOre2,
                                 (uniqueOre2.get_width() * 2,
                                 uniqueOre2.get_height() * 2))
-    uniqueOre3 = pygame.image.load('img/uniqueOre3.png').convert_alpha()
+    uniqueOre3 = pygame.image.load('img/ores/uniqueOre3.png').convert_alpha()
     uniqueOre3 = pygame.transform.scale(uniqueOre3,
                                 (uniqueOre3.get_width() * 2,
                                 uniqueOre3.get_height() * 2))
-    star = pygame.image.load('img/star.png').convert_alpha()
+    star = pygame.image.load('img/ores/star.png').convert_alpha()
     star = pygame.transform.scale(star,
                                 (star.get_width() * 2,
                                 star.get_height() * 2))
-    bigStar = pygame.image.load('img/starBig.png').convert_alpha()
+    bigStar = pygame.image.load('img/ores/starBig.png').convert_alpha()
     bigStar = pygame.transform.scale(bigStar,
                                 (bigStar.get_width() * 2,
                                 bigStar.get_height() * 2))
-    gold = pygame.image.load('img/gold.png').convert_alpha()
+    gold = pygame.image.load('img/ores/gold.png').convert_alpha()
     gold = pygame.transform.scale(gold,
                                 (gold.get_width() * 2,
                                 gold.get_height() * 2))
-    lapisLazuli = pygame.image.load('img/lapisLazuli.png').convert_alpha()
+    lapisLazuli = pygame.image.load('img/ores/lapisLazuli.png').convert_alpha()
     lapisLazuli = pygame.transform.scale(lapisLazuli,
                                 (lapisLazuli.get_width() * 2,
                                 lapisLazuli.get_height() * 2))
     
-if True: # GUI
-    heart = pygame.image.load('img/heart.png').convert_alpha()
+if True: # Upgrades
+    heart = pygame.image.load('img/upgrades/heart.png').convert_alpha()
     heart = pygame.transform.scale(heart,
                                 (heart.get_width() * 2,
                                 heart.get_height() * 2))
-    heartUnique = pygame.image.load('img/heartUnique.png').convert_alpha()
+    heartUnique = pygame.image.load('img/upgrades/heartUnique.png').convert_alpha()
     heartUnique = pygame.transform.scale(heartUnique,
                                 (heartUnique.get_width() * 2,
                                 heartUnique.get_height() * 2))
-    digPowerGUI = pygame.image.load('img/digPower.png').convert_alpha()
+    digPowerGUI = pygame.image.load('img/upgrades/digPower.png').convert_alpha()
     digPowerGUI = pygame.transform.scale(digPowerGUI,
                                 (digPowerGUI.get_width() * 2,
                                 digPowerGUI.get_height() * 2))
-    digPowerUnique = pygame.image.load('img/digPowerUnique.png').convert_alpha()
+    digPowerUnique = pygame.image.load('img/upgrades/digPowerUnique.png').convert_alpha()
     digPowerUnique = pygame.transform.scale(digPowerUnique,
                                 (digPowerUnique.get_width() * 2,
                                 digPowerUnique.get_height() * 2))
-    jumpStrengthGUI = pygame.image.load('img/jumpStrength.png').convert_alpha()
+    jumpStrengthGUI = pygame.image.load('img/upgrades/jumpStrength.png').convert_alpha()
     jumpStrengthGUI = pygame.transform.scale(jumpStrengthGUI,
                                 (jumpStrengthGUI.get_width() * 2,
                                 jumpStrengthGUI.get_height() * 2))
-    jumpStrengthUnique = pygame.image.load('img/jumpStrengthUnique.png').convert_alpha()
+    jumpStrengthUnique = pygame.image.load('img/upgrades/jumpStrengthUnique.png').convert_alpha()
     jumpStrengthUnique = pygame.transform.scale(jumpStrengthUnique,
                                 (jumpStrengthUnique.get_width() * 2,
                                 jumpStrengthUnique.get_height() * 2))
-    moneyBag = pygame.image.load('img/moneyBag.png').convert_alpha()
+    moneyBag = pygame.image.load('img/upgrades/moneyBag.png').convert_alpha()
     moneyBag = pygame.transform.scale(moneyBag,
                                 (moneyBag.get_width() * 2,
                                 moneyBag.get_height() * 2))
-    moneyBagUnique = pygame.image.load('img/moneyBagUnique.png').convert_alpha()
+    moneyBagUnique = pygame.image.load('img/upgrades/moneyBagUnique.png').convert_alpha()
     moneyBagUnique = pygame.transform.scale(moneyBagUnique,
                                 (moneyBagUnique.get_width() * 2,
                                 moneyBagUnique.get_height() * 2))
-    moveSpeedGUI = pygame.image.load('img/moveSpeed.png').convert_alpha()
+    moveSpeedGUI = pygame.image.load('img/upgrades/moveSpeed.png').convert_alpha()
     moveSpeedGUI = pygame.transform.scale(moveSpeedGUI,
                                 (moveSpeedGUI.get_width() * 2,
                                 moveSpeedGUI.get_height() * 2))
-    moveSpeedUnique = pygame.image.load('img/moveSpeedUnique.png').convert_alpha()
+    moveSpeedUnique = pygame.image.load('img/upgrades/moveSpeedUnique.png').convert_alpha()
     moveSpeedUnique = pygame.transform.scale(moveSpeedUnique,
                                 (moveSpeedUnique.get_width() * 2,
                                 moveSpeedUnique.get_height() * 2))
     
 if True: # Shop buttons and titles
+    shopBuy = pygame.image.load('img/gui/shopBuy.png').convert_alpha()
+    shopBuy = pygame.transform.scale(shopBuy,
+                                (shopBuy.get_width() * 2,
+                                shopBuy.get_height() * 2))
+    shopBuyUnique = pygame.image.load('img/gui/shopBuyUnique.png').convert_alpha()
+    shopBuyUnique = pygame.transform.scale(shopBuyUnique,
+                                (shopBuyUnique.get_width() * 2,
+                                shopBuyUnique.get_height() * 2))
+    shopPoor = pygame.image.load('img/gui/shopPoor.png').convert_alpha()
+    shopPoor = pygame.transform.scale(shopPoor,
+                                (shopPoor.get_width() * 2,
+                                shopPoor.get_height() * 2))
+    shopButtonSelect = pygame.image.load('img/gui/shopButtonSelect.png').convert_alpha()
+    shopButtonSelect = pygame.transform.scale(shopButtonSelect,
+                                (shopButtonSelect.get_width() * 2,
+                                shopButtonSelect.get_height() * 2))
+    drillSkins = pygame.image.load('img/gui/drillSkins.png').convert_alpha()
+    drillSkins = pygame.transform.scale(drillSkins,
+                                (drillSkins.get_width() * 2,
+                                drillSkins.get_height() * 2))
+    hullSkins = pygame.image.load('img/gui/hullSkins.png').convert_alpha()
+    hullSkins = pygame.transform.scale(hullSkins,
+                                (hullSkins.get_width() * 2,
+                                hullSkins.get_height() * 2))
+    upgrades = pygame.image.load('img/gui/upgrades.png').convert_alpha()
+    upgrades = pygame.transform.scale(upgrades,
+                                (upgrades.get_width() * 2,
+                                upgrades.get_height() * 2))
+    upgradesUnique = pygame.image.load('img/gui/upgradesUnique.png').convert_alpha()
+    upgradesUnique = pygame.transform.scale(upgradesUnique,
+                                (upgradesUnique.get_width() * 2,
+                                upgradesUnique.get_height() * 2))
+    stats = pygame.image.load('img/gui/stats.png').convert_alpha()
+    stats = pygame.transform.scale(stats,
+                                (stats.get_width() * 2,
+                                stats.get_height() * 2))
+    stats2 = pygame.image.load('img/gui/stats2.png').convert_alpha()
+    stats2 = pygame.transform.scale(stats2,
+                                (stats2.get_width() * 2,
+                                stats2.get_height() * 2))
+
+if False: # Debug icons
     shopBuy = pygame.image.load('img/shopBuy.png').convert_alpha()
     shopBuy = pygame.transform.scale(shopBuy,
                                 (shopBuy.get_width() * 2,
                                 shopBuy.get_height() * 2))
-    shopBuyUnique = pygame.image.load('img/shopBuyUnique.png').convert_alpha()
-    shopBuyUnique = pygame.transform.scale(shopBuyUnique,
-                                (shopBuyUnique.get_width() * 2,
-                                shopBuyUnique.get_height() * 2))
-    shopPoor = pygame.image.load('img/shopPoor.png').convert_alpha()
-    shopPoor = pygame.transform.scale(shopPoor,
-                                (shopPoor.get_width() * 2,
-                                shopPoor.get_height() * 2))
-    shopButtonSelect = pygame.image.load('img/shopButtonSelect.png').convert_alpha()
-    shopButtonSelect = pygame.transform.scale(shopButtonSelect,
-                                (shopButtonSelect.get_width() * 2,
-                                shopButtonSelect.get_height() * 2))
-    drillSkins = pygame.image.load('img/drillSkins.png').convert_alpha()
-    drillSkins = pygame.transform.scale(drillSkins,
-                                (drillSkins.get_width() * 2,
-                                drillSkins.get_height() * 2))
-    hullSkins = pygame.image.load('img/hullSkins.png').convert_alpha()
-    hullSkins = pygame.transform.scale(hullSkins,
-                                (hullSkins.get_width() * 2,
-                                hullSkins.get_height() * 2))
-    upgrades = pygame.image.load('img/upgrades.png').convert_alpha()
-    upgrades = pygame.transform.scale(upgrades,
-                                (upgrades.get_width() * 2,
-                                upgrades.get_height() * 2))
-    upgradesUnique = pygame.image.load('img/upgradesUnique.png').convert_alpha()
-    upgradesUnique = pygame.transform.scale(upgradesUnique,
-                                (upgradesUnique.get_width() * 2,
-                                upgradesUnique.get_height() * 2))
-    stats = pygame.image.load('img/stats.png').convert_alpha()
-    stats = pygame.transform.scale(stats,
-                                (stats.get_width() * 2,
-                                stats.get_height() * 2))
-    stats2 = pygame.image.load('img/stats2.png').convert_alpha()
-    stats2 = pygame.transform.scale(stats2,
-                                (stats2.get_width() * 2,
-                                stats2.get_height() * 2))
+
+drill = drillGrey
+player = hullOrange
 
 digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
 digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
