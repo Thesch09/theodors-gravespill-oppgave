@@ -11,7 +11,7 @@ flags = pygame.SCALED  |  pygame.RESIZABLE
 screen = pygame.display.set_mode((640, 480), flags)
 running = True
 clock = pygame.time.Clock()
-delta_time = 0.1
+deltaTime = 0.1
 debugQOL = False
 debugHitbox = False
 debugMovement = False
@@ -50,14 +50,14 @@ moveShop = 0
 # End of player VARs
 cam_y = y
 collision = False
-gravity = 5
+gravity = 200
 world_depth = 1250
 font = pygame.font.Font(None, size=30)
 recentlyBroken = font.render("nothing", True, (255,255,255))
 brokenCooldown = 0
 
-if True: # So that I can hide it in editor
-    # PLAYER VISUALS
+# These are if Trues so that I can hide them in editor
+if True: # PLAYER VISUALS
     drill = pygame.image.load('img/drillNormalV2.png').convert_alpha()
     drill = pygame.transform.scale(drill,
                                 (drill.get_width() * 2,
@@ -79,7 +79,7 @@ if True: # So that I can hide it in editor
                                 (break3.get_width() * 2,
                                 break3.get_height() * 2))
     
-    # Ground
+if True: # Ground
     stone = pygame.image.load('img/stoneV2.png').convert_alpha()
     stone = pygame.transform.scale(stone,
                                 (stone.get_width() * 2,
@@ -121,7 +121,7 @@ if True: # So that I can hide it in editor
                                 (magma.get_width() * 2,
                                 magma.get_height() * 2))
     
-    # Ores
+if True: # Ores
     iron = pygame.image.load('img/iron.png').convert_alpha()
     iron = pygame.transform.scale(iron,
                                 (iron.get_width() * 2,
@@ -175,7 +175,7 @@ if True: # So that I can hide it in editor
                                 (lapisLazuli.get_width() * 2,
                                 lapisLazuli.get_height() * 2))
     
-    # GUI
+if True: # GUI
     heart = pygame.image.load('img/heart.png').convert_alpha()
     heart = pygame.transform.scale(heart,
                                 (heart.get_width() * 2,
@@ -217,7 +217,7 @@ if True: # So that I can hide it in editor
                                 (moveSpeedUnique.get_width() * 2,
                                 moveSpeedUnique.get_height() * 2))
     
-    # Shop buttons and titles
+if True: # Shop buttons and titles
     shopBuy = pygame.image.load('img/shopBuy.png').convert_alpha()
     shopBuy = pygame.transform.scale(shopBuy,
                                 (shopBuy.get_width() * 2,
@@ -368,18 +368,19 @@ class shopItem:
         self.slot = slot
         self.priceIncrease = priceIncrease
 
-# Upgrades
-heartShop = shopItem(100, False, "Increases maximum HP by 5.", heart, "upgrades", 0, 10)
-digPowerShop = shopItem(25, False, "Increases dig power by 5.", digPowerGUI, "upgrades", 1, 3)
-jumpStrengthShop = shopItem(75, False, "Increases jump strength by 5.", jumpStrengthGUI, "upgrades", 2, 2.5)
-moveSpeedShop = shopItem(50, False, "Increases horisontal speed by 5.", moveSpeedGUI, "upgrades", 3, 3)
-moneyBagShop = shopItem(500, False, "Saves 1% of money on death.", moneyBag, "upgrades", 4, 2.5)
-# Unique Upgrades
-heartUniqueShop = shopItem(2, True, "Increases maximum HP by 15.", heartUnique, "unique", 0, 5)
-digPowerUniqueShop = shopItem(2, True, "Increases dig power by 20.", digPowerUnique, "unique", 1, 3)
-jumpStrengthUniqueShop = shopItem(2, True, "Increases jump strength by 15.", jumpStrengthUnique, "unique", 2, 2.5)
-moveSpeedUniqueShop = shopItem(2, True, "Increases horisontal speed by 15.", moveSpeedUnique, "unique", 3, 3)
-moneyBagUniqueShop = shopItem(5, True, "Saves 5% of money on death.", moneyBagUnique, "unique", 4, 2.5)
+# These are also if Trues so that I can hide them in editor
+if True: # Upgrades
+    heartShop = shopItem(100, False, "Increases maximum HP by 5.", heart, "upgrades", 0, 10)
+    digPowerShop = shopItem(25, False, "Increases dig power by 5.", digPowerGUI, "upgrades", 1, 3)
+    jumpStrengthShop = shopItem(75, False, "Increases jump strength by 5.", jumpStrengthGUI, "upgrades", 2, 2.5)
+    moveSpeedShop = shopItem(50, False, "Increases horisontal speed by 5.", moveSpeedGUI, "upgrades", 3, 3)
+    moneyBagShop = shopItem(500, False, "Saves 1% of money on death.", moneyBag, "upgrades", 4, 2.5)
+if True: # Unique Upgrades
+    heartUniqueShop = shopItem(2, True, "Increases maximum HP by 15.", heartUnique, "unique", 0, 5)
+    digPowerUniqueShop = shopItem(2, True, "Increases dig power by 20.", digPowerUnique, "unique", 1, 3)
+    jumpStrengthUniqueShop = shopItem(2, True, "Increases jump strength by 15.", jumpStrengthUnique, "unique", 2, 2.5)
+    moveSpeedUniqueShop = shopItem(2, True, "Increases horisontal speed by 15.", moveSpeedUnique, "unique", 3, 3)
+    moneyBagUniqueShop = shopItem(5, True, "Saves 5% of money on death.", moneyBagUnique, "unique", 4, 2.5)
 
 shop = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop, heartUniqueShop, digPowerUniqueShop, jumpStrengthUniqueShop, moveSpeedUniqueShop, moneyBagUniqueShop]
 
@@ -444,7 +445,7 @@ while running:
         collision = digSquare.colliderect(terrain[i].rect)
         if collision and keyAnyPressed:
             if maxHealth > terrain[i].damage:
-                terrain[i].health -= digPower * delta_time
+                terrain[i].health -= digPower * deltaTime
                 if random.randint(1,20) == 1:
                     digNoises[random.randint(0,2)].play()
                     print("sound")
@@ -469,16 +470,16 @@ while running:
                 recentlyBroken = font.render(f"Too weak! Need more Max HP", True, (255,255,255))
                 brokenCooldown = 1
 
-    brokenCooldown -= 1*delta_time
+    brokenCooldown -= 1*deltaTime
     if brokenCooldown > 0:
         brokenX = 640-4-recentlyBroken.get_width()
         screen.blit(recentlyBroken, (brokenX,456))
 
-    speedY += gravity
+    speedY += gravity * deltaTime
     if speedY > jumpStrength:
         speedY = jumpStrength
 
-    y -= speedY * delta_time
+    y -= speedY * deltaTime
     collision = collide(x)
     if not collision:
         jumpable = False
@@ -623,7 +624,7 @@ while running:
     keyAnyPressed = False
     if controlls == "move": # For movement, duh :) 
         if keyDPressed:
-            x += moveSpeed * delta_time
+            x += moveSpeed * deltaTime
             collision = collide(x)
             digSquare = pygame.Rect(x+24, 224+8, 16, 16)
             while collision:
@@ -637,7 +638,7 @@ while running:
             drill = pygame.transform.rotate(drill, degrees)
 
         if keyAPressed:
-            x -= moveSpeed * delta_time
+            x -= moveSpeed * deltaTime
             collision = collide(x)
             digSquare = pygame.Rect(x-8, 224+8, 16, 16)
             while collision:
@@ -804,9 +805,9 @@ while running:
     if x > 608:
         x = 608
     if y < (world_depth+50)*32*-1:
-        y = -500
+        y = -300
         print("loop")
-    if y > -500:
+    if y > -300:
         y = (world_depth+50)*32*-1
     if health < 1:
         print(deathTimer)
@@ -815,7 +816,7 @@ while running:
         if deathTimer == 0:
             deathTimer = 3
         else:
-            deathTimer -= 1*delta_time
+            deathTimer -= 1*deltaTime
             if deathTimer <= 0:
                 if playerHasUniqueMoneyBag:
                     money = math.ceil(money *moneyLoss)
@@ -835,7 +836,7 @@ while running:
 
     # end stuff
     pygame.display.flip()
-    delta_time = clock.tick(60) / 1000
-    delta_time = max(0.001, min((0.1, delta_time)))
+    deltaTime = clock.tick(60) / 1000
+    deltaTime = max(0.001, min((0.1, deltaTime)))
 
 pygame.quit()

@@ -35,7 +35,6 @@ def make_terrain(depth):
             if i.minHeight != None and i.maxHeight != None:
                 if height >= i.minHeight and height <= i.maxHeight:
                     rockTions.append(i)
-        print(len(rockTions))
         if len(rockTions) >= 1:
             if i.type == "rock":
                 selectedRockTion = rockTions[random.randint(0, len(rockTions)-1)]
