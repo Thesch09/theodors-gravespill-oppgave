@@ -81,11 +81,19 @@ if True: # Drills
     drillGrey = pygame.transform.scale(drillGrey,
                                 (drillGrey.get_width() * 2,
                                 drillGrey.get_height() * 2))
+    drillBlue = pygame.image.load("img/drill/drillBlue.png").convert_alpha
+    drillBlue = pygame.transform.scale(drillBlue,
+                                (drillBlue.get_width() * 2,
+                                drillBlue.get_height() * 2))
 if True: # Hulls
     hullOrange = pygame.image.load('img/hull/hullOrange.png').convert_alpha()
     hullOrange = pygame.transform.scale(hullOrange,
                                 (hullOrange.get_width() * 2,
                                 hullOrange.get_height() * 2))
+    hullRed = pygame.image.load('img/hull/hullRed.png').convert_alpha()
+    hullRed = pygame.transform.scale(hullRed,
+                                (hullRed.get_width() * 2,
+                                hullRed.get_height() * 2))
 if True: # Tiles
     dirt = pygame.image.load('img/tiles/dirtV3.png').convert_alpha()
     dirt = pygame.transform.scale(dirt,
@@ -377,8 +385,6 @@ digNoises = [digSFX1, digSFX2, digSFX3]
 oreBreak = pygame.mixer.Sound('sfx/oreBreak.wav')
 rockBreak = pygame.mixer.Sound('sfx/rockBreak.wav')
 
-playerDrillSkins = [drillGrey]
-
 # Drawing of terrain
 terrain = make_terrain(world_depth)
 print(world_depth)
@@ -518,6 +524,15 @@ class shopItem:
         self.trueMaxPrice = trueMaxPrice
         self.maxPurchase = maxPurchase
 
+class cosmetic:
+    def __init__(self, cost, flavour, sprite, tab, slot, owned = False):
+        self.cost = cost
+        self.flavour = flavour
+        self.sprite = sprite
+        self.owned = owned
+        self.tab = tab
+        self.slot = slot
+
 # These are also if Trues so that I can hide them in editor
 if True: # Upgrades
     heartShop = shopItem(100, False, "Increases maximum HP by 5.", heart, "upgrades", 0, 10, 1000000, 100000, 5000000)
@@ -532,7 +547,7 @@ if True: # Unique Upgrades
     moveSpeedUniqueShop = shopItem(5, True, "Increases horisontal speed by 15.", moveSpeedUnique, "unique", 3, 3, 1000, 100, 10000)
     moneyBagUniqueShop = shopItem(10, True, "Saves 5% of money on death.", moneyBagUnique, "unique", 4, 2.5, 5000, 100, 1000000, 5)
 if True: # Drill skins
-    drillGreyShop = shopItem(0, True, "The classic drill.", drillGrey, "drill", 0)
+    drillGreyShop = cosmetic(0, "The classic drill.", drillGrey, "drill", 0, True)
 
 
 shop = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop, heartUniqueShop, digPowerUniqueShop, jumpStrengthUniqueShop, moveSpeedUniqueShop, moneyBagUniqueShop, drillGreyShop]
