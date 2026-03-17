@@ -54,7 +54,6 @@ keyAnyPressed = False
 keySpacePressed = False
 degrees = 0
 shopCursorSlot = 0
-shopTab = ["upgrades", "unique", "stats", "stats 2","drill", "hull"]
 shopTabId = 0
 subShopTab = 0
 moveShop = 0
@@ -91,6 +90,30 @@ if True: # Drills
     drillBlue = pygame.transform.scale(drillBlue,
                                 (drillBlue.get_width() * 2,
                                 drillBlue.get_height() * 2))
+    drillRed = pygame.image.load('img/drill/drillRed.png').convert_alpha()
+    drillRed = pygame.transform.scale(drillRed,
+                                (drillRed.get_width() * 2,
+                                drillRed.get_height() * 2))
+    drillGold = pygame.image.load('img/drill/drillGold.png').convert_alpha()
+    drillGold = pygame.transform.scale(drillGold,
+                                (drillGold.get_width() * 2,
+                                drillGold.get_height() * 2))
+    drillUnique = pygame.image.load('img/drill/drillUnique.png').convert_alpha()
+    drillUnique = pygame.transform.scale(drillUnique,
+                                (drillUnique.get_width() * 2,
+                                drillUnique.get_height() * 2))
+    drillInverted = pygame.image.load('img/drill/drillInverted.png').convert_alpha()
+    drillInverted = pygame.transform.scale(drillInverted,
+                                (drillInverted.get_width() * 2,
+                                drillInverted.get_height() * 2))
+    drillCloak = pygame.image.load('img/drill/drillCloak.png').convert_alpha()
+    drillCloak = pygame.transform.scale(drillCloak,
+                                (drillCloak.get_width() * 2,
+                                drillCloak.get_height() * 2))
+    drillHornet = pygame.image.load('img/drill/drillHornet.png').convert_alpha()
+    drillHornet = pygame.transform.scale(drillHornet,
+                                (drillHornet.get_width() * 2,
+                                drillHornet.get_height() * 2))
 if True: # Hulls
     hullOrange = pygame.image.load('img/hull/hullOrange.png').convert_alpha()
     hullOrange = pygame.transform.scale(hullOrange,
@@ -100,6 +123,30 @@ if True: # Hulls
     hullRed = pygame.transform.scale(hullRed,
                                 (hullRed.get_width() * 2,
                                 hullRed.get_height() * 2))
+    hullPurple = pygame.image.load('img/hull/hullPurple.png').convert_alpha()
+    hullPurple = pygame.transform.scale(hullPurple,
+                                (hullPurple.get_width() * 2,
+                                hullPurple.get_height() * 2))
+    hullInverted = pygame.image.load('img/hull/hullInverted.png').convert_alpha()
+    hullInverted = pygame.transform.scale(hullInverted,
+                                (hullInverted.get_width() * 2,
+                                hullInverted.get_height() * 2))
+    hullHornet = pygame.image.load('img/hull/hullHornet.png').convert_alpha()
+    hullHornet = pygame.transform.scale(hullHornet,
+                                (hullHornet.get_width() * 2,
+                                hullHornet.get_height() * 2))
+    hullGold = pygame.image.load('img/hull/hullGold.png').convert_alpha()
+    hullGold = pygame.transform.scale(hullGold,
+                                (hullGold.get_width() * 2,
+                                hullGold.get_height() * 2))
+    hullDiamond = pygame.image.load('img/hull/hullDiamond.png').convert_alpha()
+    hullDiamond = pygame.transform.scale(hullDiamond,
+                                (hullDiamond.get_width() * 2,
+                                hullDiamond.get_height() * 2))
+    hullCloak = pygame.image.load('img/hull/hullCloak.png').convert_alpha()
+    hullCloak = pygame.transform.scale(hullCloak,
+                                (hullCloak.get_width() * 2,
+                                hullCloak.get_height() * 2))
 if True: # Tiles
     dirt = pygame.image.load('img/tiles/dirtV3.png').convert_alpha()
     dirt = pygame.transform.scale(dirt,
@@ -378,18 +425,36 @@ if True: # Debug icons
                                 (debugStatsIcon.get_width() * 2,
                                 debugStatsIcon.get_height() * 2))
 
+class shopTabs:
+    def __init__(self, name, title, slots):
+        self.name = name
+        self.title = title
+        self.slots = slots
+        if slots != None:
+            self.slots = slots-1
+if True:
+    upgradesShop = shopTabs("upgrades", upgrades, 5)
+    uniqueShop = shopTabs("unique", upgradesUnique, 5)
+    statsPage1 = shopTabs("stats", stats, None)
+    statsPage2 = shopTabs("stats 2", stats2, None)
+    drillSkinsShop = shopTabs("drill", drillSkins, 8)
+    hullSkinsShop = shopTabs("hull", hullSkins, 8)
+
+shopTab = [upgradesShop, uniqueShop, statsPage1, statsPage2, drillSkinsShop, hullSkinsShop]
+
 drill = drillGrey
 hull = hullOrange
 
-digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
-digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
-digSFX3 = pygame.mixer.Sound('sfx/dig3.wav')
-pygame.mixer.Sound.set_volume(digSFX1, 0.5)
-pygame.mixer.Sound.set_volume(digSFX2, 0.5)
-pygame.mixer.Sound.set_volume(digSFX3, 0.5)
-digNoises = [digSFX1, digSFX2, digSFX3]
-oreBreak = pygame.mixer.Sound('sfx/oreBreak.wav')
-rockBreak = pygame.mixer.Sound('sfx/rockBreak.wav')
+if True: # SFX
+    digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
+    digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
+    digSFX3 = pygame.mixer.Sound('sfx/dig3.wav')
+    pygame.mixer.Sound.set_volume(digSFX1, 0.5)
+    pygame.mixer.Sound.set_volume(digSFX2, 0.5)
+    pygame.mixer.Sound.set_volume(digSFX3, 0.5)
+    digNoises = [digSFX1, digSFX2, digSFX3]
+    oreBreak = pygame.mixer.Sound('sfx/oreBreak.wav')
+    rockBreak = pygame.mixer.Sound('sfx/rockBreak.wav')
 
 # Drawing of terrain
 terrain = make_terrain(world_depth)
@@ -495,7 +560,6 @@ def draw_terrain(screen, terrain, camera, depth):
             # Check for grass
             if i.extra == 'Grass':
                 screen.blit(grassBackground, (i.x, y))
-
 def collide(playerX):
     hitbox = pygame.Rect(playerX+4, 224, 24, 32)
     colly = 1
@@ -515,7 +579,6 @@ def redoGroundRects(terrain, camera, depth):
             collision = hitbox.colliderect(terrain[i].rect)
             if collision:
                 break
-
 def rotate(dir):
     global degrees
     global hull
@@ -525,7 +588,6 @@ def rotate(dir):
     degrees = dir
     hull = pygame.transform.rotate(hull, degrees)
     drill = pygame.transform.rotate(drill, degrees)
-
 def checkSkinBuffs(check, amount, multiplier = 1): #This function checks changes the stat that a skin does. A multiplier of 1 increases, -1 decreases
     global digPower
     global maxHealth
@@ -533,6 +595,7 @@ def checkSkinBuffs(check, amount, multiplier = 1): #This function checks changes
     global moneyLoss
     global jumpStrength
     global health
+    global moneyRepeat
     
     if check == "digPower":
         digPower += amount * multiplier
@@ -548,6 +611,8 @@ def checkSkinBuffs(check, amount, multiplier = 1): #This function checks changes
         moneyLoss +=amount * multiplier
     if check == "jumpStrength":
         jumpStrength += amount * multiplier
+    if check == "moneyRepeat":
+        jumpStrength += amount * multiplier
 
 class shopItem:
     def __init__(self, cost, unique, flavour = str, sprite = None, tab = str, slot = None, priceIncrease = None, maxPrice = None, beyondIncrease = None, trueMaxPrice = None, maxPurchase = None):
@@ -562,7 +627,6 @@ class shopItem:
         self.beyondIncrease = beyondIncrease
         self.trueMaxPrice = trueMaxPrice
         self.maxPurchase = maxPurchase
-
 class cosmetic:
     def __init__(self, cost, flavour, sprite, tab, slot, associatedStat, amount, owned = False):
         self.cost = cost
@@ -589,12 +653,33 @@ if True: # Unique upgrades
     moneyBagUniqueShop = shopItem(10, True, "Saves 5% of money on death.", moneyBagUnique, "unique", 4, 2.5, 5000, 100, 1000000, 5)
 if True: # Drill skins
     drillGreyShop = cosmetic(0, "The classic drill.", drillGrey, "drill", 0, None, None, True)
-    drillBlueShop = cosmetic(10, "+15 dig power when quipped.", drillBlue, "drill", 1, "digPower", 15)
+    drillBlueShop = cosmetic(10, "+15 dig power when equipped.", drillBlue, "drill", 1, "digPower", 15)
+    drillRedShop = cosmetic(10, "+30 dig power when equipped.", drillRed, "drill", 2, "digPower", 30)
+    drillGoldShop = cosmetic(10, "+45 dig power when equipped.", drillGold, "drill", 3, "digPower", 30)
+    drillUniqueShop = cosmetic(10, "+90 dig power when equipped.", drillUnique, "drill", 4, "digPower", 30)
+    drillInvertedShop = cosmetic(10, "+10 max HP when equipped.", drillInverted, "drill", 5, "maxHealth", 30)
+    drillCloakShop = cosmetic(20, "The cloak of a hunter.", drillCloak, "drill", 6, None, None)
+    drillHornetShop = cosmetic(20, "The head of a hunter.", drillHornet, "drill", 7, None, None)
 if True: # Hull skins
     hullOrangeShop = cosmetic(0, "The classic hull.", hullOrange, "hull", 0, None, None, True)
-    hullRedShop = cosmetic(10, "+10 maximum HP when equipped.", hullRed, "hull", 1, "maxHealth", 10)
-
-shop = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop, heartUniqueShop, digPowerUniqueShop, jumpStrengthUniqueShop, moveSpeedUniqueShop, moneyBagUniqueShop, drillGreyShop, drillBlueShop, hullOrangeShop, hullRedShop]
+    hullRedShop = cosmetic(10, "+10 max HP when equipped.", hullRed, "hull", 1, "maxHealth", 10)
+    hullPurpleShop = cosmetic(10, "+20 max HP when equipped", hullPurple, "hull", 2, "maxHealth", 20)
+    hullGoldShop = cosmetic(10, "+30 max HP when equipped", hullGold, "hull", 3, "maxHealth", 30)
+    hullInvertedShop = cosmetic(10, "+15 dig power when equipped", hullInverted, "hull", 4, "digPower", 15)
+    hullDiamondShop = cosmetic(10, "Increases money earnt", hullDiamond, "hull", 5, "moneyRepeat", 1)
+    hullHornetShop = cosmetic(20, "A familiar bug", hullHornet, "hull", 7, None, None)
+    hullCloakShop = cosmetic(20, "A familiar cloak.", hullCloak, "hull", 6, None, None)
+if True: # Lists
+    upgradesList = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop]
+    uniqueUpgradesList = [heartUniqueShop, digPowerUniqueShop, jumpStrengthUniqueShop, moveSpeedUniqueShop, moneyBagUniqueShop]
+    drillSkinsList = [drillGreyShop, drillBlueShop, drillRedShop, drillGoldShop, drillUniqueShop, drillCloakShop, drillInvertedShop, drillHornetShop]
+    hullSkinsList = [hullOrangeShop, hullRedShop, hullPurpleShop, hullInvertedShop, hullHornetShop, hullGoldShop, hullCloakShop, hullDiamondShop]
+    listList = [upgradesList, uniqueUpgradesList, drillSkinsList, hullSkinsList]
+    shop = []
+    for i in range(len(listList)):
+        for o in listList[i]:
+            shop.append(o)
+    print(shop)
 
 print(len(terrain)/20)
 hitbox = pygame.Rect(x+4, 224, 24, 32)
@@ -899,26 +984,18 @@ while running:
 
     if controlls == "shop": # For when in the shop GUI
 
-        if shopTab[shopTabId] == "drill":
-            screen.blit(drillSkins, (240,32))
-        if shopTab[shopTabId] == "upgrades":
-            screen.blit(upgrades, (240,32))
-        if shopTab[shopTabId] == "hull":
-            screen.blit(hullSkins, (240,32))
-        if shopTab[shopTabId] == "unique":
-            screen.blit(upgradesUnique, (240,32))
-        if shopTab[shopTabId] == "stats":
-            screen.blit(stats, (240,32))
-        if shopTab[shopTabId] == "stats 2":
-            screen.blit(stats2, (240,32))
+        screen.blit(shopTab[shopTabId].title, (240, 32))
 
         for i in shop:
             shopText = font.render(f"{i.flavour} Cost: {i.cost}", True, (255,255,255))
-            if i.tab == shopTab[shopTabId]:
+            if i.tab == shopTab[shopTabId].name:
+                if shopTab[shopTabId].name == "drill" or shopTab[shopTabId].name == "hull":
+                    if i.owned:
+                        shopText = font.render(f"{i.flavour}", True, (255,255,255))
                 screen.blit(i.sprite, (32, 64+36*i.slot))
                 screen.blit(shopText, (64, 72+36*i.slot))
 
-                if shopTab[shopTabId] == "upgrades" or shopTab[shopTabId] == "unique":
+                if shopTab[shopTabId].name == "upgrades" or shopTab[shopTabId].name == "unique":
                     if not i.unique:
                         if money >= i.cost or debugMoney:
                             screen.blit(shopBuy, (540, 64+36*i.slot))
@@ -971,7 +1048,7 @@ while running:
                                     print("oi")
                         else:
                             screen.blit(shopPoor, (540, 64+36*i.slot))
-                if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+                if shopTab[shopTabId].name == "drill" or shopTab[shopTabId].name == "hull":
                     if not i.owned:
                         for verySpecificVaribleJustForThisSpotInTheCode in range(2):
                             if uniqueOres >= i.cost or debugMoney:
@@ -993,7 +1070,7 @@ while running:
                         shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
                         if shopCollision and keySpacePressed and moveShop <= 0:
                             if i.associatedStat != None:
-                                if shopTab[shopTabId] == "drill":
+                                if shopTab[shopTabId].name == "drill":
                                     checkSkinBuffs(drillBuffStat, drillBuff, -1)
                                 else:
                                     checkSkinBuffs(hullBuffStat, hullBuff, -1)
@@ -1031,7 +1108,7 @@ while running:
                             moveShop = 0.5
 
             if i.tab != "drill" and i.tab != "hull":
-                if shopTab[shopTabId] == "stats" and not i.unique:
+                if shopTab[shopTabId].name == "stats" and not i.unique:
                     screen.blit(i.sprite, (32, 64+68*i.slot))
                     if i.sprite == heart:
                         shopText = font.render(f"How much health you have before you die.", True, (255,255,255))
@@ -1050,7 +1127,7 @@ while running:
                         shopText2 = font.render(f"Value: {moneyLoss}", True, (255,255,255))
                     screen.blit(shopText, (64, 72+68*i.slot))
                     screen.blit(shopText2, (64, 104+68*i.slot))
-                if shopTab[shopTabId] == "stats 2" and i.unique:
+                if shopTab[shopTabId].name == "stats 2" and i.unique:
                     screen.blit(i.sprite, (32, 64+68*i.slot))
                     if i.sprite == heartUnique:
                         shopText = font.render(f"Having this upgrade gives you a chance to heal\nwhen you break rocks.", True, (255,255,255))
@@ -1066,24 +1143,26 @@ while running:
                     screen.blit(shopText, (64, 72+68*i.slot))
                     if i.sprite == digPowerUnique:
                         screen.blit(shopText2, (64, 104+68*i.slot))
-        if shopTab[shopTabId] != "stats" and shopTab[shopTabId] != "stats 2":
-            if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+        if shopTab[shopTabId].name != "stats" and shopTab[shopTabId].name != "stats 2":
+            if shopTab[shopTabId].name == "drill" or shopTab[shopTabId].name == "hull":
                 screen.blit(shopButtonSelect, (464+72*subShopTab,60+36*shopCursorSlot))
             else:
                 screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
         if moveShop <= 0:
-            if keySPressed:
+            print(shopTabId)
+            if keySPressed and shopTab[shopTabId].name != "stats" and shopTab[shopTabId].name != "stats 2":
                 shopCursorSlot += 1
                 moveShop = 0.5
-            if keyWPressed:
+            if keyWPressed and shopTab[shopTabId].name != "stats" and shopTab[shopTabId].name != "stats 2":
                 shopCursorSlot -= 1
                 moveShop = 0.5
-            if shopCursorSlot < 0:
-                shopCursorSlot = 4
-            if shopCursorSlot > 4:
-                shopCursorSlot = 0
+            if shopTab[shopTabId].name != "stats" and shopTab[shopTabId].name != "stats 2":
+                if shopCursorSlot < 0:
+                    shopCursorSlot = shopTab[shopTabId].slots
+                if shopCursorSlot > shopTab[shopTabId].slots:
+                    shopCursorSlot = 0
             if keyDPressed:
-                if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+                if shopTab[shopTabId].name == "drill" or shopTab[shopTabId].name == "hull":
                     if subShopTab == 1:
                         shopTabId += 1
                         shopCursorSlot = 0
@@ -1096,7 +1175,7 @@ while running:
                     subShopTab = 0
                 moveShop = 0.5
             if keyAPressed:
-                if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+                if shopTab[shopTabId].name == "drill" or shopTab[shopTabId].name == "hull":
                     if subShopTab == 0:
                         shopTabId -= 1
                         shopCursorSlot = 0

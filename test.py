@@ -10,6 +10,27 @@ idx = "4"
 ground = egg("ground", 4)
 print(ground.name)
 print(ground.rect)
+
+listA = ["a","b","c"]
+print(listA)
+listB = ["d","e","f"]
+print(listB)
+listC = []
+
+print(listC)
+for i in listA:
+    listC.append(i)
+    print(listC)
+for i in listB:
+    listC.append(i)
+    print(listC)
+'''
+listC.append(listA)
+print(listC)
+listC.append(listB)
+print(listC)
+'''
+
 running = True
 while running:
 
