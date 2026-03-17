@@ -141,4 +141,3 @@ def make_terrain(depth):
         height += 1
     
     return(terrain)
-
