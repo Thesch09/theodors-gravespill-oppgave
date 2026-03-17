@@ -37,9 +37,14 @@ moneyLoss = 0.0 # Float. 0 is lose all, 1 is keep all
 deathTimer = 0
 controlls = "move"
 depth = 0
+# Upgrades
 playerHasUniqueMoneyBag = False
 playerHasUniqueHeart = False
 playerHasUniquePickaxe = 0.0 # Float so it scales slower
+drillBuff = None
+drillBuffStat = None
+hullBuff = None
+hullBuffStat = None
 # Player movement VARs
 keyDPressed = False
 keyAPressed = False
@@ -51,6 +56,7 @@ degrees = 0
 shopCursorSlot = 0
 shopTab = ["upgrades", "unique", "stats", "stats 2","drill", "hull"]
 shopTabId = 0
+subShopTab = 0
 moveShop = 0
 # End of player VARs
 cam_y = y
@@ -81,7 +87,7 @@ if True: # Drills
     drillGrey = pygame.transform.scale(drillGrey,
                                 (drillGrey.get_width() * 2,
                                 drillGrey.get_height() * 2))
-    drillBlue = pygame.image.load("img/drill/drillBlue.png").convert_alpha
+    drillBlue = pygame.image.load('img/drill/drillBlue.png').convert_alpha()
     drillBlue = pygame.transform.scale(drillBlue,
                                 (drillBlue.get_width() * 2,
                                 drillBlue.get_height() * 2))
@@ -373,7 +379,7 @@ if True: # Debug icons
                                 debugStatsIcon.get_height() * 2))
 
 drill = drillGrey
-player = hullOrange
+hull = hullOrange
 
 digSFX1 = pygame.mixer.Sound('sfx/dig1.wav')
 digSFX2 = pygame.mixer.Sound('sfx/dig2.wav')
@@ -510,6 +516,39 @@ def redoGroundRects(terrain, camera, depth):
             if collision:
                 break
 
+def rotate(dir):
+    global degrees
+    global hull
+    global drill
+    hull = pygame.transform.rotate(hull, degrees*-1)
+    drill = pygame.transform.rotate(drill, degrees*-1)
+    degrees = dir
+    hull = pygame.transform.rotate(hull, degrees)
+    drill = pygame.transform.rotate(drill, degrees)
+
+def checkSkinBuffs(check, amount, multiplier = 1): #This function checks changes the stat that a skin does. A multiplier of 1 increases, -1 decreases
+    global digPower
+    global maxHealth
+    global moveSpeed
+    global moneyLoss
+    global jumpStrength
+    global health
+    
+    if check == "digPower":
+        digPower += amount * multiplier
+    if check == "maxHealth":
+        maxHealth += amount * multiplier
+        if multiplier > 0:
+            health += amount
+        if multiplier < 0 and health > maxHealth:
+            health = maxHealth
+    if check == "moveSpeed":
+        moveSpeed += amount * multiplier
+    if check == "moneyLoss":
+        moneyLoss +=amount * multiplier
+    if check == "jumpStrength":
+        jumpStrength += amount * multiplier
+
 class shopItem:
     def __init__(self, cost, unique, flavour = str, sprite = None, tab = str, slot = None, priceIncrease = None, maxPrice = None, beyondIncrease = None, trueMaxPrice = None, maxPurchase = None):
         self.cost = cost
@@ -525,10 +564,12 @@ class shopItem:
         self.maxPurchase = maxPurchase
 
 class cosmetic:
-    def __init__(self, cost, flavour, sprite, tab, slot, owned = False):
+    def __init__(self, cost, flavour, sprite, tab, slot, associatedStat, amount, owned = False):
         self.cost = cost
         self.flavour = flavour
         self.sprite = sprite
+        self.associatedStat = associatedStat
+        self.amount = amount
         self.owned = owned
         self.tab = tab
         self.slot = slot
@@ -540,17 +581,20 @@ if True: # Upgrades
     jumpStrengthShop = shopItem(75, False, "Increases jump strength by 5.", jumpStrengthGUI, "upgrades", 2, 2.5, 750000, 50000, 2500000)
     moveSpeedShop = shopItem(50, False, "Increases horisontal speed by 5.", moveSpeedGUI, "upgrades", 3, 500000, 30000, 100000)
     moneyBagShop = shopItem(500, False, "Saves 1% of money on death.", moneyBag, "upgrades", 4, 2.5, 10000, 10000, 1000000, 50)
-if True: # Unique Upgrades
+if True: # Unique upgrades
     heartUniqueShop = shopItem(2, True, "Increases maximum HP by 15.", heartUnique, "unique", 0, 5, 5000, 500, 10000)
     digPowerUniqueShop = shopItem(5, True, "Increases dig power by 20.", digPowerUnique, "unique", 1, 3, 1000, 750, 10000)
     jumpStrengthUniqueShop = shopItem(3, True, "Increases jump strength by 15.", jumpStrengthUnique, "unique", 2, 2.5, 3000, 300, 30000)
     moveSpeedUniqueShop = shopItem(5, True, "Increases horisontal speed by 15.", moveSpeedUnique, "unique", 3, 3, 1000, 100, 10000)
     moneyBagUniqueShop = shopItem(10, True, "Saves 5% of money on death.", moneyBagUnique, "unique", 4, 2.5, 5000, 100, 1000000, 5)
 if True: # Drill skins
-    drillGreyShop = cosmetic(0, "The classic drill.", drillGrey, "drill", 0, True)
+    drillGreyShop = cosmetic(0, "The classic drill.", drillGrey, "drill", 0, None, None, True)
+    drillBlueShop = cosmetic(10, "+15 dig power when quipped.", drillBlue, "drill", 1, "digPower", 15)
+if True: # Hull skins
+    hullOrangeShop = cosmetic(0, "The classic hull.", hullOrange, "hull", 0, None, None, True)
+    hullRedShop = cosmetic(10, "+10 maximum HP when equipped.", hullRed, "hull", 1, "maxHealth", 10)
 
-
-shop = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop, heartUniqueShop, digPowerUniqueShop, jumpStrengthUniqueShop, moveSpeedUniqueShop, moneyBagUniqueShop, drillGreyShop]
+shop = [heartShop, digPowerShop, jumpStrengthShop, moveSpeedShop, moneyBagShop, heartUniqueShop, digPowerUniqueShop, jumpStrengthUniqueShop, moveSpeedUniqueShop, moneyBagUniqueShop, drillGreyShop, drillBlueShop, hullOrangeShop, hullRedShop]
 
 print(len(terrain)/20)
 hitbox = pygame.Rect(x+4, 224, 24, 32)
@@ -665,7 +709,7 @@ while running:
         speedY = 0
         y -= 1
 
-    screen.blit(player, (x, 223))
+    screen.blit(hull, (x, 223))
     screen.blit(drill, (x, 223))
 
     cam_y = y
@@ -725,6 +769,7 @@ while running:
                     shopOverlay = True
                     controlls = "shop"
                     shopCursorSlot = 0
+                    subShopTab = 0
                     shopTabId = 0
                     moveShop = 0
             # Debug
@@ -828,11 +873,7 @@ while running:
                 x -= 1
                 collision = collide(x)
             keyAnyPressed = True
-            player = pygame.transform.rotate(player, degrees*-1)
-            drill = pygame.transform.rotate(drill, degrees*-1)
-            degrees = -90
-            player = pygame.transform.rotate(player, degrees)
-            drill = pygame.transform.rotate(drill, degrees)
+            rotate(-90)
 
         if keyAPressed:
             x -= moveSpeed * deltaTime
@@ -842,30 +883,19 @@ while running:
                 x += 1
                 collision = collide(x)
             keyAnyPressed = True
-            player = pygame.transform.rotate(player, degrees*-1)
-            drill = pygame.transform.rotate(drill, degrees*-1)
-            degrees = 90
-            player = pygame.transform.rotate(player, degrees)
-            drill = pygame.transform.rotate(drill, degrees)
+            rotate(90)
 
         if keyWPressed:
             digSquare = pygame.Rect(x+8, 224-8, 16, 16)
             if jumpable:
                 speedY -= jumpStrength
             keyAnyPressed = True
-            player = pygame.transform.rotate(player, degrees*-1)
-            drill = pygame.transform.rotate(drill, degrees*-1)
-            degrees = 0
-            player = pygame.transform.rotate(player, degrees)
-            drill = pygame.transform.rotate(drill, degrees)
+            rotate(0)
+
         if keySPressed:
             digSquare = pygame.Rect(x+8, 224+24, 16, 16)
             keyAnyPressed = True
-            player = pygame.transform.rotate(player, degrees*-1)
-            drill = pygame.transform.rotate(drill, degrees*-1)
-            degrees = 180
-            player = pygame.transform.rotate(player, degrees)
-            drill = pygame.transform.rotate(drill, degrees)
+            rotate(180)
 
     if controlls == "shop": # For when in the shop GUI
 
@@ -887,114 +917,197 @@ while running:
             if i.tab == shopTab[shopTabId]:
                 screen.blit(i.sprite, (32, 64+36*i.slot))
                 screen.blit(shopText, (64, 72+36*i.slot))
-                if not i.unique:
-                    if money >= i.cost or debugMoney:
-                        screen.blit(shopBuy, (540, 64+36*i.slot))
-                        shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
-                        shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
-                        shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
-                        if shopCollision and keySpacePressed and moveShop <= 0:
-                            if not debugMoney:
-                                money -= i.cost
-                            i.cost = math.floor(i.cost*i.priceIncrease)
-                            if i.sprite == heart:
-                                maxHealth += 5
-                                health = maxHealth
-                            if i.sprite == digPowerGUI:
-                                digPower += 5
-                            if i.sprite == jumpStrengthGUI:
-                                jumpStrength += 5
-                            if i.sprite == moveSpeedGUI:
-                                moveSpeed += 5
-                            if i.sprite == moneyBag:
-                                moneyLoss += 0.01
-                            print("oi")
-                    else:
-                        screen.blit(shopPoor, (540, 64+36*i.slot))
-                if i.unique:
-                    if uniqueOres >= i.cost or debugMoney:
-                        screen.blit(shopBuyUnique, (540, 64+36*i.slot))
-                        shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
-                        shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
-                        shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
-                        if shopCollision and keySpacePressed and moveShop <= 0:
-                            if i.tab == "unique":
+
+                if shopTab[shopTabId] == "upgrades" or shopTab[shopTabId] == "unique":
+                    if not i.unique:
+                        if money >= i.cost or debugMoney:
+                            screen.blit(shopBuy, (540, 64+36*i.slot))
+                            shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
+                            shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
+                            shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
+                            if shopCollision and keySpacePressed and moveShop <= 0:
                                 if not debugMoney:
-                                    uniqueOres -= i.cost
+                                    money -= i.cost
                                 i.cost = math.floor(i.cost*i.priceIncrease)
-                                if i.sprite == heartUnique:
-                                    maxHealth += 15
+                                if i.sprite == heart:
+                                    maxHealth += 5
                                     health = maxHealth
-                                    playerHasUniqueHeart = True
-                                if i.sprite == digPowerUnique:
-                                    digPower += 20
-                                    playerHasUniquePickaxe += 0.5
-                                if i.sprite == jumpStrengthUnique:
-                                    jumpStrength += 15
-                                if i.sprite == moveSpeedUnique:
-                                    moveSpeed += 15
-                                if i.sprite == moneyBagUnique:
-                                    moneyLoss += 0.05
-                                    playerHasUniqueMoneyBag = True
+                                if i.sprite == digPowerGUI:
+                                    digPower += 5
+                                if i.sprite == jumpStrengthGUI:
+                                    jumpStrength += 5
+                                if i.sprite == moveSpeedGUI:
+                                    moveSpeed += 5
+                                if i.sprite == moneyBag:
+                                    moneyLoss += 0.01
                                 print("oi")
+                        else:
+                            screen.blit(shopPoor, (540, 64+36*i.slot))
+                    if i.unique:
+                        if uniqueOres >= i.cost or debugMoney:
+                            screen.blit(shopBuyUnique, (540, 64+36*i.slot))
+                            shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
+                            shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
+                            shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
+                            if shopCollision and keySpacePressed and moveShop <= 0:
+                                if i.tab == "unique":
+                                    if not debugMoney:
+                                        uniqueOres -= i.cost
+                                    i.cost = math.floor(i.cost*i.priceIncrease)
+                                    if i.sprite == heartUnique:
+                                        maxHealth += 15
+                                        health = maxHealth
+                                        playerHasUniqueHeart = True
+                                    if i.sprite == digPowerUnique:
+                                        digPower += 20
+                                        playerHasUniquePickaxe += 0.5
+                                    if i.sprite == jumpStrengthUnique:
+                                        jumpStrength += 15
+                                    if i.sprite == moveSpeedUnique:
+                                        moveSpeed += 15
+                                    if i.sprite == moneyBagUnique:
+                                        moneyLoss += 0.05
+                                        playerHasUniqueMoneyBag = True
+                                    print("oi")
+                        else:
+                            screen.blit(shopPoor, (540, 64+36*i.slot))
+                if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+                    if not i.owned:
+                        for verySpecificVaribleJustForThisSpotInTheCode in range(2):
+                            if uniqueOres >= i.cost or debugMoney:
+                                screen.blit(shopBuyUnique, (468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot))
+                                shopButtonHitbox = pygame.Rect(468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot, 64, 32)
+                                shopCursorHitbox = pygame.Rect(468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*shopCursorSlot, 64, 32)
+                                shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
+                                if shopCollision and keySpacePressed and moveShop <= 0:
+                                    i.owned = True
+                                    if not debugMoney:
+                                        uniqueOres -= i.cost
+                                    moveShop += 0.5
+                            else:
+                                screen.blit(shopPoor, (468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot))
                     else:
-                        screen.blit(shopPoor, (540, 64+36*i.slot))
-            if shopTab[shopTabId] == "stats" and not i.unique:
-                screen.blit(i.sprite, (32, 64+68*i.slot))
-                if i.sprite == heart:
-                    shopText = font.render(f"How much health you have before you die.", True, (255,255,255))
-                    shopText2 = font.render(f"Value: {maxHealth}", True, (255,255,255))
-                if i.sprite == digPowerGUI:
-                    shopText = font.render(f"How much damage you deal to rocks.", True, (255,255,255))
-                    shopText2 = font.render(f"Value: {digPower}", True, (255,255,255))
-                if i.sprite == jumpStrengthGUI:
-                    shopText = font.render(f"How high you jump and your max terminal velocity.", True, (255,255,255))
-                    shopText2 = font.render(f"Value: {jumpStrength}", True, (255,255,255))
-                if i.sprite == moveSpeedGUI:
-                    shopText = font.render(f"How fast you move horizontally.", True, (255,255,255))
-                    shopText2 = font.render(f"Value: {moveSpeed}", True, (255,255,255))
-                if i.sprite == moneyBag:
-                    shopText = font.render(f"How much money you save on death in %.", True, (255,255,255))
-                    shopText2 = font.render(f"Value: {moneyLoss}", True, (255,255,255))
-                screen.blit(shopText, (64, 72+68*i.slot))
-                screen.blit(shopText2, (64, 104+68*i.slot))
-            if shopTab[shopTabId] == "stats 2" and i.unique:
-                screen.blit(i.sprite, (32, 64+68*i.slot))
-                if i.sprite == heartUnique:
-                    shopText = font.render(f"Having this upgrade gives you a chance to heal\nwhen you break rocks.", True, (255,255,255))
-                if i.sprite == digPowerUnique:
-                    shopText = font.render(f"Having this upgrade increases money from ores", True, (255,255,255))
-                    shopText2 = font.render(f"Value: {playerHasUniquePickaxe}", True, (255,255,255))
-                if i.sprite == jumpStrengthUnique:
-                    shopText = font.render(f"This upgrade has no special ability.", True, (255,255,255))
-                if i.sprite == moveSpeedUnique:
-                    shopText = font.render(f"This upgrade has no special ability.", True, (255,255,255))
-                if i.sprite == moneyBagUnique:
-                    shopText = font.render(f"Having this upgrade ceilings saved money instead\nof flooring it. You save like $1", True, (255,255,255))
-                screen.blit(shopText, (64, 72+68*i.slot))
-                if i.sprite == digPowerUnique:
+                        screen.blit(shopEquip, (540, 64+36*i.slot))
+                        shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
+                        shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
+                        shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
+                        if shopCollision and keySpacePressed and moveShop <= 0:
+                            if i.associatedStat != None:
+                                if shopTab[shopTabId] == "drill":
+                                    checkSkinBuffs(drillBuffStat, drillBuff, -1)
+                                else:
+                                    checkSkinBuffs(hullBuffStat, hullBuff, -1)
+                                checkSkinBuffs(i.associatedStat, i.amount, 1)
+                            else:
+                                if shopTab[shopTabId] == "drill":
+                                    checkSkinBuffs(drillBuffStat, drillBuff, -1)
+                                else:
+                                    checkSkinBuffs(hullBuffStat, hullBuff, -1)
+                            print(f"DB: {drillBuff}, {drillBuffStat}")
+                            print(f"HB: {hullBuff}, {hullBuffStat}")
+                            print(f"AS: {i.amount}, {i.associatedStat}")
+                            
+                            if i.tab == "hull":
+                                hull = i.sprite
+                                hullBuff = i.amount
+                                hullBuffStat = i.associatedStat
+                            if i.tab == "drill":
+                                drill = i.sprite
+                                drillBuff = i.amount
+                                drillBuffStat = i.associatedStat
+                            rotate(0)
+                            moveShop = 0.5
+                            
+                        screen.blit(shopVisual, (468, 64+36*i.slot))
+                        shopButtonHitbox = pygame.Rect(468, 64+36*i.slot, 64, 32)
+                        shopCursorHitbox = pygame.Rect(468, 64+36*shopCursorSlot, 64, 32)
+                        shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
+                        if shopCollision and keySpacePressed and moveShop <= 0:
+                            if i.tab == "hull":
+                                hull = i.sprite
+                            if i.tab == "drill":
+                                drill = i.sprite
+                            rotate(0)
+                            moveShop = 0.5
+
+            if i.tab != "drill" and i.tab != "hull":
+                if shopTab[shopTabId] == "stats" and not i.unique:
+                    screen.blit(i.sprite, (32, 64+68*i.slot))
+                    if i.sprite == heart:
+                        shopText = font.render(f"How much health you have before you die.", True, (255,255,255))
+                        shopText2 = font.render(f"Value: {maxHealth}", True, (255,255,255))
+                    if i.sprite == digPowerGUI:
+                        shopText = font.render(f"How much damage you deal to rocks.", True, (255,255,255))
+                        shopText2 = font.render(f"Value: {digPower}", True, (255,255,255))
+                    if i.sprite == jumpStrengthGUI:
+                        shopText = font.render(f"How high you jump and your max terminal velocity.", True, (255,255,255))
+                        shopText2 = font.render(f"Value: {jumpStrength}", True, (255,255,255))
+                    if i.sprite == moveSpeedGUI:
+                        shopText = font.render(f"How fast you move horizontally.", True, (255,255,255))
+                        shopText2 = font.render(f"Value: {moveSpeed}", True, (255,255,255))
+                    if i.sprite == moneyBag:
+                        shopText = font.render(f"How much money you save on death in %.", True, (255,255,255))
+                        shopText2 = font.render(f"Value: {moneyLoss}", True, (255,255,255))
+                    screen.blit(shopText, (64, 72+68*i.slot))
                     screen.blit(shopText2, (64, 104+68*i.slot))
+                if shopTab[shopTabId] == "stats 2" and i.unique:
+                    screen.blit(i.sprite, (32, 64+68*i.slot))
+                    if i.sprite == heartUnique:
+                        shopText = font.render(f"Having this upgrade gives you a chance to heal\nwhen you break rocks.", True, (255,255,255))
+                    if i.sprite == digPowerUnique:
+                        shopText = font.render(f"Having this upgrade increases money from ores", True, (255,255,255))
+                        shopText2 = font.render(f"Value: {playerHasUniquePickaxe}", True, (255,255,255))
+                    if i.sprite == jumpStrengthUnique:
+                        shopText = font.render(f"This upgrade has no special ability.", True, (255,255,255))
+                    if i.sprite == moveSpeedUnique:
+                        shopText = font.render(f"This upgrade has no special ability.", True, (255,255,255))
+                    if i.sprite == moneyBagUnique:
+                        shopText = font.render(f"Having this upgrade ceilings saved money instead\nof flooring it. You save like $1", True, (255,255,255))
+                    screen.blit(shopText, (64, 72+68*i.slot))
+                    if i.sprite == digPowerUnique:
+                        screen.blit(shopText2, (64, 104+68*i.slot))
         if shopTab[shopTabId] != "stats" and shopTab[shopTabId] != "stats 2":
-            screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
+            if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+                screen.blit(shopButtonSelect, (464+72*subShopTab,60+36*shopCursorSlot))
+            else:
+                screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
         if moveShop <= 0:
             if keySPressed:
                 shopCursorSlot += 1
-                moveShop = 1
+                moveShop = 0.5
             if keyWPressed:
                 shopCursorSlot -= 1
-                moveShop = 1
+                moveShop = 0.5
             if shopCursorSlot < 0:
                 shopCursorSlot = 4
             if shopCursorSlot > 4:
                 shopCursorSlot = 0
             if keyDPressed:
-                shopTabId += 1
-                shopCursorSlot = 0
-                moveShop = 1
+                if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+                    if subShopTab == 1:
+                        shopTabId += 1
+                        shopCursorSlot = 0
+                        subShopTab = 0
+                    else:
+                        subShopTab += 1
+                else:
+                    shopTabId += 1
+                    shopCursorSlot = 0
+                    subShopTab = 0
+                moveShop = 0.5
             if keyAPressed:
-                shopTabId -= 1
-                shopCursorSlot = 0
-                moveShop = 1
+                if shopTab[shopTabId] == "drill" or shopTab[shopTabId] == "hull":
+                    if subShopTab == 0:
+                        shopTabId -= 1
+                        shopCursorSlot = 0
+                        subShopTab = 1
+                    else:
+                        subShopTab -= 1
+                else:
+                    shopTabId -= 1
+                    shopCursorSlot = 0
+                    subShopTab = 1
+                moveShop = 0.5
             if shopTabId < 0:
                 shopTabId = 5
             if shopTabId > 5:
