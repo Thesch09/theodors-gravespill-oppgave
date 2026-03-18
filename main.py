@@ -3,7 +3,7 @@ import math
 import random
 import time
 import os
-from terrain import make_terrain
+from terrain import make_terrain, saveTerrain
 
 pygame.init()
 
@@ -72,6 +72,7 @@ with open("!saves/player.txt") as save:
 # Always
 # Setup
 running = True
+inGame = False
 clock = pygame.time.Clock()
 deltaTime = 0.1
 shopOverlay = False
@@ -390,6 +391,11 @@ def checkSkinBuffs(check, amount, player, multiplier = 1): #This function checks
     if check == "moneyRepeat":
         player.jumpStrength += amount * multiplier
 
+def whatSave(base, bonusString = None, extraComment = ""):
+    with open("!saves/player.txt", "a") as save:
+        save.write(f"{base} {str(bonusString)} {extraComment}\n")
+
+
 class shopItem:
     def __init__(self, cost, unique, flavour = str, sprite = None, tab = str, slot = None, priceIncrease = None, maxPrice = None, beyondIncrease = None, trueMaxPrice = None, maxPurchase = None):
         self.cost = cost
@@ -456,6 +462,32 @@ if True: # Lists
         for o in listList[i]:
             shop.append(o)
     print(shop)
+
+def saveGame(player, terrain):
+    saveTerrain(terrain)
+    if os.path.exists("!saves/player.txt"):
+        os.remove("!saves/player.txt")
+    else:
+        print("The file does not exist")
+    whatSave("-- Use two dashes (--) with a space ( ) after to mark as a comment. Only on the start is required, but at the end makes it pretty. Only at the start if it's a comment on a line --\n\n")
+    whatSave("-- Has debug been used? --\n")
+    whatSave("debugUsed = ", player.debugUsed)
+    whatSave("-- Stats --\n")
+    whatSave("moveSpeed = ", player.moveSpeed)
+    whatSave("jumpStrength = ", player.jumpStrength)
+    whatSave("digPower = ", player.digPower)
+    whatSave("money = ", player.money)
+    whatSave("uniqueOres = ", player.uniqueOres)
+    whatSave("maxHealth = ", player.maxHealth)
+    whatSave("moneyLoss = ", player.moneyLoss, "-- something something I |Ii|II|I_")
+    whatSave("-- Upgrades --")
+    whatSave("hasUniqueMoneyBag = ", player.hasUniqueMoneyBag)
+    whatSave("hasUniqueHeart = ", player.hasUniqueHeart)
+    whatSave("hasUniquePickaxe = ", player.hasUniquePickaxe, "-- Float so it scales slower")
+    whatSave("drillBuff = ", player.drillBuff)
+    whatSave("drillBuffStat = ", player.drillBuffStat)
+    whatSave("hullBuff = ", player.hullBuff)
+    whatSave("hullBuffStat = ", player.hullBuffStat)
 
 print(len(terrain)/20)
 hitbox = pygame.Rect(x+4, 224, 24, 32)
@@ -594,6 +626,7 @@ while running:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            saveGame(player, terrain)
             running = False
 
         # Checking for when a button is pressed
