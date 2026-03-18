@@ -942,7 +942,7 @@ while running:
                     effectiveSlot = menuSlot-1
                     if effectiveSlot < 0:
                         effectiveSlot = 2
-                    screen.blit(menuSlot3.sprite, (slotX[effectiveSlot]-2,0))
+                    screen.blit(menuSlot3.sprite, (slotX[effectiveSlot],0))
             else:
                 if i == 0:
                     slotX = [432,176,-80]
@@ -952,7 +952,7 @@ while running:
                     screen.blit(menuEmpty.sprite, (slotX[effectiveSlot],0))
                 if i == 1:
                     slotX = [432,176,-80]
-                    screen.blit(menuSlot3.sprite, (slotX[menuSlot],0))
+                    screen.blit(menuEmpty.sprite, (slotX[menuSlot],0))
                     
                 if i == 2:
                     slotX = [432,176,-80]
@@ -1007,11 +1007,11 @@ while running:
                 menuSubSlot = 0
             menuMove += 0.5
         if menuSubMenu == "new":
-            screen.blit(menuNew.sprite,(176-2,-2))
+            screen.blit(menuNew.sprite,(176,0))
         if menuSubMenu == "load":
-            screen.blit(menuLoad.sprite,(176-2,0))
+            screen.blit(menuLoad.sprite,(176,0))
         if menuSubMenu == "delete":
-            screen.blit(menuDelete.sprite,(176-4,-2))
+            screen.blit(menuDelete.sprite,(176-2,0))
         if menuMove <= 0:
             if keyAPressed:
                 menuSlot -= 1
@@ -1041,7 +1041,7 @@ while running:
         if menuSubMenu == "":
             screen.blit(menuSlotSelect.sprite,(176,0))
         else:
-            screen.blit(menuSelect.sprite,(176,320-96*(menuSubSlot+1)-4))
+            screen.blit(menuSelect.sprite,(176,320-96*(menuSubSlot+1)))
         #print(menuSubMenu, menuSubSlot)
 
     for event in pygame.event.get():
