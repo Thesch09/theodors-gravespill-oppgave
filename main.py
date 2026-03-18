@@ -49,6 +49,8 @@ recentlyBroken = font.render("nothing", True, (255,255,255))
 brokenCooldown = 0
 menuSlot = 0
 menuMove = 0
+menuSubMenu = ""
+menuSubSlot = 0
 # Debug
 debugDig = False
 debugHitbox = False
@@ -76,6 +78,8 @@ x = 304
 y = -640
 speedY = 0
 cam_y = y
+
+
 def loadPlayer(save):
     with open(f"!saves/save{save}/player.txt") as save:
         playerData = []
@@ -215,54 +219,29 @@ if True: # Upgrades
     moneyBag = materials("Money Bag", "upgrade", "img/upgrades/moneyBag.png")
     moneyBagUnique = materials("Unique Money Bag", "upgrade", "img/upgrades/moneyBagUnique.png")
 if True: # Shop buttons and titles
-    shopBuy = pygame.image.load('img/gui/shopBuy.png').convert_alpha()
-    shopBuy = pygame.transform.scale(shopBuy,
-                                (shopBuy.get_width() * 2,
-                                shopBuy.get_height() * 2))
-    shopBuyUnique = pygame.image.load('img/gui/shopBuyUnique.png').convert_alpha()
-    shopBuyUnique = pygame.transform.scale(shopBuyUnique,
-                                (shopBuyUnique.get_width() * 2,
-                                shopBuyUnique.get_height() * 2))
-    shopPoor = pygame.image.load('img/gui/shopPoor.png').convert_alpha()
-    shopPoor = pygame.transform.scale(shopPoor,
-                                (shopPoor.get_width() * 2,
-                                shopPoor.get_height() * 2))
-    shopButtonSelect = pygame.image.load('img/gui/shopButtonSelect.png').convert_alpha()
-    shopButtonSelect = pygame.transform.scale(shopButtonSelect,
-                                (shopButtonSelect.get_width() * 2,
-                                shopButtonSelect.get_height() * 2))
-    drillSkins = pygame.image.load('img/gui/drillSkins.png').convert_alpha()
-    drillSkins = pygame.transform.scale(drillSkins,
-                                (drillSkins.get_width() * 2,
-                                drillSkins.get_height() * 2))
-    hullSkins = pygame.image.load('img/gui/hullSkins.png').convert_alpha()
-    hullSkins = pygame.transform.scale(hullSkins,
-                                (hullSkins.get_width() * 2,
-                                hullSkins.get_height() * 2))
-    upgrades = pygame.image.load('img/gui/upgrades.png').convert_alpha()
-    upgrades = pygame.transform.scale(upgrades,
-                                (upgrades.get_width() * 2,
-                                upgrades.get_height() * 2))
-    upgradesUnique = pygame.image.load('img/gui/upgradesUnique.png').convert_alpha()
-    upgradesUnique = pygame.transform.scale(upgradesUnique,
-                                (upgradesUnique.get_width() * 2,
-                                upgradesUnique.get_height() * 2))
-    stats = pygame.image.load('img/gui/stats.png').convert_alpha()
-    stats = pygame.transform.scale(stats,
-                                (stats.get_width() * 2,
-                                stats.get_height() * 2))
-    stats2 = pygame.image.load('img/gui/stats2.png').convert_alpha()
-    stats2 = pygame.transform.scale(stats2,
-                                (stats2.get_width() * 2,
-                                stats2.get_height() * 2))
-    shopVisual = pygame.image.load('img/gui/shopVisual.png').convert_alpha()
-    shopVisual = pygame.transform.scale(shopVisual,
-                                (shopVisual.get_width() * 2,
-                                shopVisual.get_height() * 2))
-    shopEquip = pygame.image.load('img/gui/shopEquip.png').convert_alpha()
-    shopEquip = pygame.transform.scale(shopEquip,
-                                (shopEquip.get_width() * 2,
-                                shopEquip.get_height() * 2))
+    shopBuy = materials("Shop Buy", "shop", "img/gui/shopBuy.png")
+    shopBuyUnique = materials("Shop Buy Unique", "shop", "img/gui/shopBuyUnique.png")
+    shopPoor = materials("Shop Poor", "shop", "img/gui/shopPoor.png")
+    shopButtonSelect = materials("Shop Button Select", "shop", "img/gui/shopButtonSelect.png")
+    drillSkins = materials("Drill Skins", "shop", "img/gui/drillSkins.png")
+    hullSkins = materials("Hull Skins", "shop", "img/gui/hullSkins.png")
+    upgrades = materials("Upgrades", "shop", "img/gui/upgrades.png")
+    upgradesUnique = materials("Upgrades Unique", "shop", "img/gui/upgradesUnique.png")
+    stats = materials("Stats", "shop", "img/gui/stats.png")
+    stats2 = materials("Stats 2", "shop", "img/gui/stats2.png")
+    shopVisual = materials("Shop Visual", "shop", "img/gui/shopVisual.png")
+    shopEquip = materials("Shop Equip", "shop", "img/gui/shopEquip.png")
+    # Main menu
+    menuEmpty = materials("Menu Empty", "mainMenu", "img/gui/menuEmpty.png")
+    menuSlot1 = materials("Menu Slot 1", "mainMenu", "img/gui/menuSlot1.png")
+    menuSlot2 = materials("Menu Slot 2", "mainMenu", "img/gui/menuSlot2.png")
+    menuSlot3 = materials("Menu Slot 3", "mainMenu", "img/gui/menuSlot3.png")
+    menuSlotSelect = materials("Menu Slot Select", "mainMenu", "img/gui/menuSlotSelect.png")
+    menuSelect = materials("Menu Select", "mainMenu", "img/gui/menuSelect.png")
+    menuNew = materials("Menu New", "mainMenu", "img/gui/menuNew.png")
+    menuLoad = materials("Menu Load", "mainMenu", "img/gui/menuLoad.png")
+    menuDelete = materials("Menu Delete", "mainMenu", "img/gui/menuDelete.png")
+    
 if True: # Debug icons
     debugIcon = pygame.image.load('img/debug/debug.png').convert_alpha()
     debugIcon = pygame.transform.scale(debugIcon,
@@ -297,12 +276,12 @@ class shopTabs:
         if slots != None:
             self.slots = slots-1
 if True:
-    upgradesShop = shopTabs("upgrades", upgrades, 5)
-    uniqueShop = shopTabs("unique", upgradesUnique, 5)
-    statsPage1 = shopTabs("stats", stats, None)
-    statsPage2 = shopTabs("stats 2", stats2, None)
-    drillSkinsShop = shopTabs("drill", drillSkins, 8)
-    hullSkinsShop = shopTabs("hull", hullSkins, 8)
+    upgradesShop = shopTabs("upgrades", upgrades.sprite, 5)
+    uniqueShop = shopTabs("unique", upgradesUnique.sprite, 5)
+    statsPage1 = shopTabs("stats", stats.sprite, None)
+    statsPage2 = shopTabs("stats 2", stats2.sprite, None)
+    drillSkinsShop = shopTabs("drill", drillSkins.sprite, 8)
+    hullSkinsShop = shopTabs("hull", hullSkins.sprite, 8)
 
 shopTab = [upgradesShop, uniqueShop, statsPage1, statsPage2, drillSkinsShop, hullSkinsShop]
 
@@ -698,7 +677,7 @@ while running:
                     if shopTab[shopTabId].name == "upgrades" or shopTab[shopTabId].name == "unique":
                         if not i.unique:
                             if player.money >= i.cost or debugMoney:
-                                screen.blit(shopBuy, (540, 64+36*i.slot))
+                                screen.blit(shopBuy.sprite, (540, 64+36*i.slot))
                                 shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                                 shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
                                 shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
@@ -719,10 +698,10 @@ while running:
                                         player.moneyLoss += 0.01
                                     print("oi")
                             else:
-                                screen.blit(shopPoor, (540, 64+36*i.slot))
+                                screen.blit(shopPoor.sprite, (540, 64+36*i.slot))
                         if i.unique:
                             if player.uniqueOres >= i.cost or debugMoney:
-                                screen.blit(shopBuyUnique, (540, 64+36*i.slot))
+                                screen.blit(shopBuyUnique.sprite, (540, 64+36*i.slot))
                                 shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                                 shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
                                 shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
@@ -747,12 +726,12 @@ while running:
                                             player.hasUniqueMoneyBag = True
                                         print("oi")
                             else:
-                                screen.blit(shopPoor, (540, 64+36*i.slot))
+                                screen.blit(shopPoor.sprite, (540, 64+36*i.slot))
                     if shopTab[shopTabId].name == "drill" or shopTab[shopTabId].name == "hull":
                         if not i.owned:
                             for verySpecificVaribleJustForThisSpotInTheCode in range(2):
                                 if player.uniqueOres >= i.cost or debugMoney:
-                                    screen.blit(shopBuyUnique, (468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot))
+                                    screen.blit(shopBuyUnique.sprite, (468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot))
                                     shopButtonHitbox = pygame.Rect(468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot, 64, 32)
                                     shopCursorHitbox = pygame.Rect(468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*shopCursorSlot, 64, 32)
                                     shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
@@ -762,9 +741,9 @@ while running:
                                             player.uniqueOres -= i.cost
                                         moveShop += 0.5
                                 else:
-                                    screen.blit(shopPoor, (468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot))
+                                    screen.blit(shopPoor.sprite, (468+72*verySpecificVaribleJustForThisSpotInTheCode, 64+36*i.slot))
                         else:
-                            screen.blit(shopEquip, (540, 64+36*i.slot))
+                            screen.blit(shopEquip.sprite, (540, 64+36*i.slot))
                             shopButtonHitbox = pygame.Rect(540, 64+36*i.slot, 64, 32)
                             shopCursorHitbox = pygame.Rect(540, 64+36*shopCursorSlot, 64, 32)
                             shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
@@ -795,7 +774,7 @@ while running:
                                 rotate(0)
                                 moveShop = 0.5
                                 
-                            screen.blit(shopVisual, (468, 64+36*i.slot))
+                            screen.blit(shopVisual.sprite, (468, 64+36*i.slot))
                             shopButtonHitbox = pygame.Rect(468, 64+36*i.slot, 64, 32)
                             shopCursorHitbox = pygame.Rect(468, 64+36*shopCursorSlot, 64, 32)
                             shopCollision = shopCursorHitbox.colliderect(shopButtonHitbox)
@@ -844,9 +823,9 @@ while running:
                             screen.blit(shopText2, (64, 104+68*i.slot))
             if shopTab[shopTabId].name != "stats" and shopTab[shopTabId].name != "stats 2":
                 if shopTab[shopTabId].name == "drill" or shopTab[shopTabId].name == "hull":
-                    screen.blit(shopButtonSelect, (464+72*subShopTab,60+36*shopCursorSlot))
+                    screen.blit(shopButtonSelect.sprite, (464+72*subShopTab,60+36*shopCursorSlot))
                 else:
-                    screen.blit(shopButtonSelect,(536,60+36*shopCursorSlot))
+                    screen.blit(shopButtonSelect.sprite,(536,60+36*shopCursorSlot))
             if moveShop <= 0:
                 print(shopTabId)
                 if keySPressed and shopTab[shopTabId].name != "stats" and shopTab[shopTabId].name != "stats 2":
@@ -938,24 +917,101 @@ while running:
                 screen.blit(debugMoneyIcon, (448, 0))
 
     else: # Main Menu
-        print("menu")
         savedGames = os.listdir("!saves")
-        print(f"{savedGames}")
-        screen.fill((0,0,0))
-        screen.blit(hullHornet.sprite,(0+64*menuSlot,0))
-        if keySpacePressed:
-            save = menuSlot + 1
-            saveExists = False
-            for i in savedGames:
-                if i == f"save{save}":
+        screen.fill((122,122,122))
+        saveExists = False
+        for i in range(3):
+            for o in savedGames:
+                if o == f"save{i+1}":
                     saveExists = True
                     break
+                else:
+                    saveExists = False
             if saveExists:
-                loadSave(save)
+                if i == 0:
+                    slotX = [432,176,-80]
+                    effectiveSlot = menuSlot+1
+                    if effectiveSlot > 2:
+                        effectiveSlot = 0
+                    screen.blit(menuSlot1.sprite, (slotX[effectiveSlot],0))
+                if i == 1:
+                    slotX = [432,176,-80]
+                    screen.blit(menuSlot2.sprite, (slotX[menuSlot],0))
+                if i == 2:
+                    slotX = [432,176,-80]
+                    effectiveSlot = menuSlot-1
+                    if effectiveSlot < 0:
+                        effectiveSlot = 2
+                    screen.blit(menuSlot3.sprite, (slotX[effectiveSlot]-2,0))
             else:
-                newSave(save)
-            inGame = True
-            controlls = "move"
+                if i == 0:
+                    slotX = [432,176,-80]
+                    effectiveSlot = menuSlot+1
+                    if effectiveSlot > 2:
+                        effectiveSlot = 0
+                    screen.blit(menuEmpty.sprite, (slotX[effectiveSlot],0))
+                if i == 1:
+                    slotX = [432,176,-80]
+                    screen.blit(menuSlot3.sprite, (slotX[menuSlot],0))
+                    
+                if i == 2:
+                    slotX = [432,176,-80]
+                    effectiveSlot = menuSlot-1
+                    if effectiveSlot < 0:
+                        effectiveSlot = 2
+                    screen.blit(menuEmpty.sprite, (slotX[effectiveSlot],0))
+
+        if keySpacePressed and menuMove <= 0:
+            save = menuSlot + 1
+            if menuSubMenu == "":
+                saveExists = False
+                for i in savedGames:
+                    if i == f"save{save}":
+                        saveExists = True
+                        break
+            if menuSubMenu == "load":
+                if menuSubSlot == 2:
+                    loadSave(save)
+                    inGame = True
+                    controlls = "move"
+                elif menuSubSlot == 1:
+                    menuSubMenu = "delete"
+                    menuSubSlot = 0
+                    print("DELETE")
+                elif menuSubSlot == 0:
+                    menuSubMenu = ""
+                    menuSubSlot = 0
+            elif menuSubMenu == "new":
+                if menuSubSlot == 1:
+                    newSave(save)
+                    inGame = True
+                    controlls = "move"
+                if menuSubSlot == 0:
+                    menuSubMenu = ""
+                    menuSubSlot = 0
+            elif menuSubMenu == "delete":
+                if menuSubSlot == 1:
+                    os.remove(f"!saves/save{save}/player.txt")
+                    os.remove(f"!saves/save{save}/terrain.txt")
+                    os.rmdir(f"!saves/save{save}")
+                    menuSubMenu = ""
+                    menuSubSlot = 0
+                if menuSubSlot == 0:
+                    menuSubMenu = ""
+                    menuSubSlot = 0
+            elif saveExists:
+                menuSubMenu = "load"
+                menuSubSlot = 0
+            else:
+                menuSubMenu = "new"
+                menuSubSlot = 0
+            menuMove += 0.5
+        if menuSubMenu == "new":
+            screen.blit(menuNew.sprite,(176-2,-2))
+        if menuSubMenu == "load":
+            screen.blit(menuLoad.sprite,(176-2,0))
+        if menuSubMenu == "delete":
+            screen.blit(menuDelete.sprite,(176-4,-2))
         if menuMove <= 0:
             if keyAPressed:
                 menuSlot -= 1
@@ -963,12 +1019,30 @@ while running:
             if keyDPressed:
                 menuSlot += 1
                 menuMove += 0.5
+            if keyWPressed:
+                menuSubSlot +=1
+                menuMove += 0.5
+            if keySPressed:
+                menuSubSlot -=1
+                menuMove += 0.5
             if menuSlot > 2:
                 menuSlot = 0
             if menuSlot < 0:
                 menuSlot = 2
+            if menuSubSlot > 1:
+                if menuSubMenu != "load" or menuSubSlot > 2:
+                    menuSubSlot = 0
+            if menuSubSlot < 0:
+                menuSubSlot = 1
+                if menuSubMenu == "load":
+                    menuSubSlot += 1
         else:
             menuMove -= 2*deltaTime
+        if menuSubMenu == "":
+            screen.blit(menuSlotSelect.sprite,(176,0))
+        else:
+            screen.blit(menuSelect.sprite,(176,320-96*(menuSubSlot+1)-4))
+        #print(menuSubMenu, menuSubSlot)
 
     for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1081,7 +1155,7 @@ while running:
                 if event.key == pygame.K_s:
                     print("S up")
                     keySPressed = False
-                if event.key == pygame.K_SPACE and controlls == "shop":
+                if event.key == pygame.K_SPACE and controlls != "move":
                     keySpacePressed = False
     # end stuff
     pygame.display.flip()
