@@ -1,4 +1,5 @@
 import pygame
+import os
 screen = pygame.display.set_mode((640, 480))
 
 class egg:
@@ -16,6 +17,8 @@ print(listA)
 listB = ["d","e","f"]
 print(listB)
 listC = []
+
+os.makedirs("!saves/save4")
 
 print(listC)
 for i in listA:

@@ -3,13 +3,13 @@ import random
 import math
 import os
 # Generate the terrain
-def saveTerrain(terrain):
-    if os.path.exists("!saves/terrain.txt"):
-        os.remove("!saves/terrain.txt")
+def saveTerrain(terrain,save):
+    if os.path.exists(f"!saves/save{save}/terrain.txt"):
+        os.remove(f"!saves/save{save}/terrain.txt")
     else:
         print("The file does not exist")
     for i in terrain:
-        with open("!saves/terrain.txt", "a") as world:
+        with open(f"!saves/save{save}/terrain.txt", "a") as world:
             world.write(f"Position: {str(int(i.y/32))},{str(int(i.x/32))}\n")
             if not i.mined:
                 if i.extra != "":
@@ -26,8 +26,62 @@ def saveTerrain(terrain):
                     world.write(f"\tDamage: {i.damage}\n")
             if i.mined:
                 world.write("\tMined\n")
-                world.write(f"\tStone: {i.ore}\n")
-def make_terrain(depth):
+                if i.extra == "Grass":
+                    world.write(f"\tStone: {i.ore} with {i.extra}\n")
+                else:
+                    world.write(f"\tStone: {i.ore}\n")
+
+
+def loadTerrain(save):
+    terrain = []
+    with open(f"!saves/save{save}/terrain.txt") as world:
+        for tile in world:
+            class block:
+                # Can be modified by ore/mineral
+                ore = ''
+                extra = ''
+                hardness = 10
+                value = 1
+                damage = 0
+                # Exclusivly by unique ore
+                uniqueOre = 0
+                # Can't be modified by ore/mineral
+                x = 0
+                y = 0
+                rect = pygame.Rect(x,y,32,32)
+                mined = False
+                health = hardness
+                deep = None
+            split = tile.split()
+            if split[0] == "Position:":
+                terrain.append(block)
+                splits = split[1].split(",") 
+                terrain[-1].deep = int(splits[0])
+                terrain[-1].y = 32*int(splits[0])
+                terrain[-1].x = 32*int(splits[1])
+            if split[0] == "Stone:":
+                withFound = False
+                for i in split:
+                    if i != "Stone:" and i != "with":
+                        if not withFound:
+                            terrain[-1].ore = terrain[-1].ore + i
+                        else:
+                            terrain[-1].extra = terrain[-1].extra + i
+                    if i == "with":
+                        withFound = True
+            if split[0] == "Hardness:":
+                terrain[-1].hardness == int(split[1])
+            if split[0] == "Mined":
+                terrain[-1].mined = True
+            if split[0] == "Health:":
+                terrain[-1].health = float(split[1])
+            if split[0] == "Damage:":
+                terrain[-1].damage += int(split[1])
+    return(terrain)
+                
+
+
+def make_terrain(depth, save):
     class ore:
         def __init__(self, type, name, hardness, value, damage, minHeight = None, maxHeight = None, chance = None, uniqueOre = None):
             self.type = type
@@ -166,16 +220,8 @@ def make_terrain(depth):
             
         height += 1
     # Add to the terrain.txt file
-    saveTerrain(terrain)
+    saveTerrain(terrain, save)
 
-    '''
-    with open("!saves/terrain.txt") as world:
-        tileID = 0
-        for tile in world:
-            if tileID == 0:
-                split = tile.split()
-                print(split[1].split(","))
-                tileID += 1
-    '''
+
 
     return(terrain)
