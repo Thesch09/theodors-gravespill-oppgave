@@ -1,0 +1,20 @@
+-- Use two dashes (--) with a space ( ) after to mark as a comment. Only on the start is required, but at the end makes it pretty --
+
+-- Has debug been used? --
+debugUsed = True
+-- Stats --
+moveSpeed = 80
+jumpStrength = 150
+digPower = 30
+money = 0
+uniqueOres = 0
+maxHealth = 25
+moneyLoss = 0.0 # Float. 0 is lose all, 1 is keep all
+-- Upgrades --
+hasUniqueMoneyBag = False
+hasUniqueHeart = False
+hasUniquePickaxe = 0.0 # Float so it scales slower
+drillBuff = None
+drillBuffStat = None
+hullBuff = None
+hullBuffStat = None
