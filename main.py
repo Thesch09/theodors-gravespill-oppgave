@@ -15,7 +15,7 @@ class playerClass:
     def __init__(self, debugUsed, moveSpeed, jumpStrength, digPower, money, uniqueOres, maxHealth, moneyLoss, hasUniqueMoneyBag, hasUniqueHeart, hasUniquePickaxe, drillBuff, drillBuffStat, hullBuff, hullBuffStat):
         # Has debug been used
         self.debugUsed = debugUsed
-        #Stats
+        # Stats
         self.moveSpeed = moveSpeed
         self.jumpStrength = jumpStrength
         self.digPower = digPower
@@ -322,9 +322,9 @@ terrain = make_terrain(world_depth)
 print(world_depth)
 def draw_terrain(screen, terrain, camera, depth):
     for i in terrain:
-        y = i.y + 600 + camera
+        y = i.y + 1000 + camera
 
-        if not i.mined and i.deep + renderDistance > abs(depth) and i.deep - renderDistance < abs(depth): # Not mined
+        if not i.mined and i.deep + renderDistance > depth and i.deep - renderDistance < abs(depth): # Not mined
             for tile in tiles:
                 if tile.type == "stone" and i.ore == tile.name:
                     screen.blit(tile.sprite, (i.x, y))
@@ -339,7 +339,7 @@ def draw_terrain(screen, terrain, camera, depth):
             if i.health < i.hardness/4*3:
                 screen.blit(break1, (i.x, y))
         
-        if i.mined and i.deep + renderDistance > abs(depth) and i.deep - renderDistance < abs(depth): # Mined
+        if i.mined and i.deep + renderDistance > depth and i.deep - renderDistance < abs(depth): # Mined
             for tile in tiles:
                 if tile.type == "background" and i.ore == tile.name or tile.type == "background" and i.extra == tile.name:
                     screen.blit(tile.sprite, (i.x, y))
@@ -353,8 +353,8 @@ def collide(playerX):
 def redoGroundRects(terrain, camera, depth):
     hitbox = pygame.Rect(x+4, 226, 24, 32)
     for i in range(len(terrain)):
-        if terrain[i].deep + renderDistance > abs(depth) and terrain[i].deep - renderDistance < abs(depth):
-            y = terrain[i].y + 600 + camera
+        if terrain[i].deep + renderDistance > depth and terrain[i].deep - renderDistance < abs(depth):
+            y = terrain[i].y + 1000 + camera
             terrain[i].rect = pygame.Rect(0,0,32,32)
             if not terrain[i].mined:
                 terrain[i].rect = pygame.Rect(terrain[i].x, y, 32, 32)  # This line causes the hitboxes to appear where the terrain is visually

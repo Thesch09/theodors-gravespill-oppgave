@@ -1,8 +1,13 @@
 import pygame
 import random
 import math
+import os
 # Generate the terrain
 def make_terrain(depth):
+    if os.path.exists("!saves/terrain.txt"):
+        os.remove("!saves/terrain.txt")
+    else:
+        print("The file does not exist")
     class ore:
         def __init__(self, type, name, hardness, value, damage, minHeight = None, maxHeight = None, chance = None, uniqueOre = None):
             self.type = type
@@ -115,8 +120,7 @@ def make_terrain(depth):
                 deep = height
             terrain.append(block)
             terrain[-1].x = i*32
-            terrain[-1].y = 350+height*32
-            terrain[-1].rect = pygame.Rect(terrain[-1].x,terrain[-1].y,32,32)
+            terrain[-1].y = height*32
 
             # Base rock
             addToTerrain(rocks, terrain)
@@ -137,7 +141,39 @@ def make_terrain(depth):
             if math.floor(((height-10)/10)) >= 1:
                 terrain[-1].value = math.ceil(terrain[-1].value * 1.1 * math.floor(((height-10)/10)))
             terrain[-1].health = terrain[-1].hardness
+
+            
             
         height += 1
-    
+    # Add to the terrain.txt file
+    for i in terrain:
+        with open("!saves/terrain.txt", "a") as world:
+            world.write(f"Position: {str(int(i.y/32))},{str(int(i.x/32))}\n")
+            if not i.mined:
+                if i.extra != "":
+                    world.write(f"\tStone: {i.ore} with {i.extra}\n")
+                else:
+                    world.write(f"\tStone: {i.ore}\n")
+                world.write(f"\tHardness: {i.hardness}\n")
+                if i.health < i.hardness:
+                    world.write(f"\tRemaining Health: {i.health}")
+                world.write(f"\tValue: {i.value}\n")
+                if i.uniqueOre > 0:
+                    world.write(f"\tUnique Ore: {i.uniqueOre}\n")
+                if i.damage > 0:
+                    world.write(f"\tDamage: {i.damage}\n")
+            if i.mined:
+                world.write("\tMined\n")
+                world.write(f"\tStone: {i.ore}\n")
+
+    '''
+    with open("!saves/terrain.txt") as world:
+        tileID = 0
+        for tile in world:
+            if tileID == 0:
+                split = tile.split()
+                print(split[1].split(","))
+                tileID += 1
+    '''
+
     return(terrain)

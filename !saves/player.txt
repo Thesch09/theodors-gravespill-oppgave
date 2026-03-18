@@ -1,4 +1,4 @@
--- Use two dashes (--) with a space ( ) after to mark as a comment. Only on the start is required, but at the end makes it pretty --
+-- Use two dashes (--) with a space ( ) after to mark as a comment. Only on the start is required, but at the end makes it pretty. Only at the start if it's a comment on a line --
 
 -- Has debug been used? --
 debugUsed = True
@@ -9,11 +9,11 @@ digPower = 30
 money = 0
 uniqueOres = 0
 maxHealth = 25
-moneyLoss = 0.0 # Float. 0 is lose all, 1 is keep all
+moneyLoss = 0.0 -- Float. 0 is lose all, 1 is keep all
 -- Upgrades --
 hasUniqueMoneyBag = False
 hasUniqueHeart = False
-hasUniquePickaxe = 0.0 # Float so it scales slower
+hasUniquePickaxe = 0.0 -- Float so it scales slower
 drillBuff = None
 drillBuffStat = None
 hullBuff = None
