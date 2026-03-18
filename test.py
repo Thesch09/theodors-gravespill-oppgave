@@ -1,4 +1,5 @@
 import pygame
+import os
 screen = pygame.display.set_mode((640, 480))
 
 class egg:
@@ -10,6 +11,29 @@ idx = "4"
 ground = egg("ground", 4)
 print(ground.name)
 print(ground.rect)
+
+listA = ["a","b","c"]
+print(listA)
+listB = ["d","e","f"]
+print(listB)
+listC = []
+
+os.makedirs("!saves/save4")
+
+print(listC)
+for i in listA:
+    listC.append(i)
+    print(listC)
+for i in listB:
+    listC.append(i)
+    print(listC)
+'''
+listC.append(listA)
+print(listC)
+listC.append(listB)
+print(listC)
+'''
+
 running = True
 while running:
 

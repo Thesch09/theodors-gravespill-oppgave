@@ -1,8 +1,87 @@
 import pygame
 import random
 import math
+import os
 # Generate the terrain
-def make_terrain(depth):
+def saveTerrain(terrain,save):
+    if os.path.exists(f"!saves/save{save}/terrain.txt"):
+        os.remove(f"!saves/save{save}/terrain.txt")
+    else:
+        print("The file does not exist")
+    for i in terrain:
+        with open(f"!saves/save{save}/terrain.txt", "a") as world:
+            world.write(f"Position: {str(int(i.y/32))},{str(int(i.x/32))}\n")
+            if not i.mined:
+                if i.extra != "":
+                    world.write(f"\tStone: {i.ore} with {i.extra}\n")
+                else:
+                    world.write(f"\tStone: {i.ore}\n")
+                world.write(f"\tHardness: {i.hardness}\n")
+                if i.health < i.hardness:
+                    world.write(f"\tRemaining Health: {i.health}")
+                world.write(f"\tValue: {i.value}\n")
+                if i.uniqueOre > 0:
+                    world.write(f"\tUnique Ore: {i.uniqueOre}\n")
+                if i.damage > 0:
+                    world.write(f"\tDamage: {i.damage}\n")
+            if i.mined:
+                world.write("\tMined\n")
+                if i.extra == "Grass":
+                    world.write(f"\tStone: {i.ore} with {i.extra}\n")
+                else:
+                    world.write(f"\tStone: {i.ore}\n")
+
+
+def loadTerrain(save):
+    terrain = []
+    with open(f"!saves/save{save}/terrain.txt") as world:
+        for tile in world:
+            class block:
+                # Can be modified by ore/mineral
+                ore = ''
+                extra = ''
+                hardness = 10
+                value = 1
+                damage = 0
+                # Exclusivly by unique ore
+                uniqueOre = 0
+                # Can't be modified by ore/mineral
+                x = 0
+                y = 0
+                rect = pygame.Rect(x,y,32,32)
+                mined = False
+                health = hardness
+                deep = None
+            split = tile.split()
+            if split[0] == "Position:":
+                terrain.append(block)
+                splits = split[1].split(",") 
+                terrain[-1].deep = int(splits[0])
+                terrain[-1].y = 32*int(splits[0])
+                terrain[-1].x = 32*int(splits[1])
+            if split[0] == "Stone:":
+                withFound = False
+                for i in split:
+                    if i != "Stone:" and i != "with":
+                        if not withFound:
+                            terrain[-1].ore = terrain[-1].ore + i
+                        else:
+                            terrain[-1].extra = terrain[-1].extra + i
+                    if i == "with":
+                        withFound = True
+            if split[0] == "Hardness:":
+                terrain[-1].hardness == int(split[1])
+            if split[0] == "Mined":
+                terrain[-1].mined = True
+            if split[0] == "Health:":
+                terrain[-1].health = float(split[1])
+            if split[0] == "Damage:":
+                terrain[-1].damage += int(split[1])
+    return(terrain)
+                
+
+
+def make_terrain(depth, save):
     class ore:
         def __init__(self, type, name, hardness, value, damage, minHeight = None, maxHeight = None, chance = None, uniqueOre = None):
             self.type = type
@@ -21,7 +100,12 @@ def make_terrain(depth):
             terrain[location].value = ore.value
             terrain[location].damage = ore.damage
         elif ore.type == "mineral":
-            terrain[location].extra = ore.name
+            if ore.name == "eye":
+                terrain[location].extra = eyes[random.randint(0,2)]
+            elif ore.name == "squint":
+                terrain[location].extra = f"Squinting {eyes[random.randint(0,2)]}"
+            else:
+                terrain[location].extra = ore.name
             terrain[location].hardness += ore.hardness
             terrain[location].value += ore.value
             terrain[location].damage += ore.damage
@@ -75,8 +159,12 @@ def make_terrain(depth):
     uniqueOre1 = ore("mineral", "Unique Ore", 100, 15, 5, 0, depth, 100, 1)
     uniqueOre2 = ore("mineral", "Big Unique Ore", 500, 100, 30, 0, depth, 200, 2)
     uniqueOre3 = ore("mineral", "Large Unique Ore", 1000, 1000, 90, 0, depth, 300, 3)
+    eye = ore("mineral", "eye", 100, 50, 0, 300, 440, 90)
+    eyeSquint = ore("mineral", "squint", 150, 50, 0, 300, 440, 90)
+    mouth = ore("mineral", "Mouth", 200, 200, 20, 300, 440, 80)
 
-    ores = [coal, iron, star, star2, gold, copper, diamond, rainbowite, bismuth, lapisLazuli, uniqueOre1, uniqueOre2, uniqueOre3]
+    eyes = ["Blue Eye","Green Eye","Red Eye"]
+    ores = [coal, iron, star, star2, gold, copper, diamond, rainbowite, bismuth, lapisLazuli, uniqueOre1, uniqueOre2, uniqueOre3, eye, eyeSquint, mouth]
 
     # Special stuff
     magma = ore("rock","Magma", 70, 50, 50)
@@ -106,18 +194,15 @@ def make_terrain(depth):
                 deep = height
             terrain.append(block)
             terrain[-1].x = i*32
-            terrain[-1].y = 350+height*32
-            terrain[-1].rect = pygame.Rect(terrain[-1].x,terrain[-1].y,32,32)
+            terrain[-1].y = height*32
 
             # Base rock
             addToTerrain(rocks, terrain)
             if height >= 175 and height <= 700 and random.randint(1, 50) == 1:
                 addOre(magma, terrain, -1)
             if height >= 1200 and random.randint(1,4) == 1:
-                terrain[-1].ore = ""
                 terrain[-1].mined = True
             if height >= 1248 and random.randint(1,2) == 1:
-                terrain[-1].ore = ""
                 terrain[-1].mined = True
 
             # Minerals
@@ -130,8 +215,13 @@ def make_terrain(depth):
             if math.floor(((height-10)/10)) >= 1:
                 terrain[-1].value = math.ceil(terrain[-1].value * 1.1 * math.floor(((height-10)/10)))
             terrain[-1].health = terrain[-1].hardness
+
+            
             
         height += 1
-    
-    return(terrain)
+    # Add to the terrain.txt file
+    saveTerrain(terrain, save)
 
+
+
+    return(terrain)
